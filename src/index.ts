@@ -1,4 +1,17 @@
-// Main library exports - these are packaged in your distributable
-export const isOdd = (n: number): boolean => {
-  return !!(n & 1);
-};
+// core
+
+// core/util
+export {logger, childLogger, getHistory} from "./core/util/logger";
+
+// core/net
+export {
+  init,
+  connect,
+  disconnect,
+  setSocketEvents,
+  getRpc,
+  join,
+  leave,
+  sendMatchState,
+  getApi,
+} from "./core/net/connection";
