@@ -1,12 +1,4 @@
-export type TimedVault = {
-  name: string;
-  type: string;
-  startedAt: number;
-  startingValue: number;
-  parameters: number[];
-  maxCapacity: number;
-  isEnabled: boolean;
-};
+import {TimedVault} from "./types.gen";
 
 export function isVaultFull(vault: TimedVault) {
   if (!vault) {
