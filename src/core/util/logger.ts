@@ -117,6 +117,20 @@ const createLogger = (category?: string) => {
   return instance;
 };
 
+export interface ILogTarget {
+  debug: (message: string, ...replacements: any[]) => void;
+  info: (message: string, ...replacements: any[]) => void;
+  warn: (message: string, ...replacements: any[]) => void;
+  error: (message: string, ...replacements: any[]) => void;
+}
+
+export class ConsoleLogTarget implements ILogTarget {
+  debug = console.debug;
+  info = console.info;
+  warn = console.warn;
+  error = console.error;
+}
+
 export const getHistory = () => _logHistory;
 export const logger = createLogger();
 export const childLogger = (name: string) => {

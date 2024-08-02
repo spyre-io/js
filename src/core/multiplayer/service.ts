@@ -29,6 +29,14 @@ export interface IMultiplayerService {
     factory: IMatchHandlerFactory,
     signals: MatchmakingAcceptSignals,
   ): Promise<void>;
+
+  join(matchId: string, meta: Kv<string>, retries: number): Promise<Match>;
+  leave(): Promise<void>;
+  send(
+    opCode: number,
+    payload: string | Uint8Array,
+    retries?: number,
+  ): Promise<void>;
 }
 
 export class MultiplayerService implements IMultiplayerService {
@@ -56,6 +64,35 @@ export class MultiplayerService implements IMultiplayerService {
     this.account = account;
     this.web3 = web3;
     this.connection = connection;
+  }
+
+  join = async (
+    matchId: string,
+    meta: Kv<string>,
+    retries: number = 3,
+  ): Promise<Match> => {
+    return this.connection.join(matchId, meta, retries);
+  };
+
+  leave(): Promise<void> {
+    return this.connection.leave();
+  }
+
+  send(
+    opCode: number,
+    payload: string | Uint8Array,
+    retries?: number,
+  ): Promise<void> {
+    if (!this.match) {
+      throw new Error("No match");
+    }
+
+    return this.connection.sendMatchState(
+      this.match.match_id,
+      opCode,
+      payload,
+      retries,
+    );
   }
 
   async findMatches(bracketId: number): Promise<void> {
@@ -169,12 +206,4 @@ export class MultiplayerService implements IMultiplayerService {
     this.handler = factory.instance(match.match_id);
     this.handler.joined(this.context);
   }
-
-  private join = async (
-    matchId: string,
-    meta: Kv<string>,
-    retries: number = 3,
-  ): Promise<Match> => {
-    throw new Error("Not implemented");
-  };
 }

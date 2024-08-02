@@ -25,6 +25,7 @@
     "start": "vite --host --open",
     "build": "tsc && vite build",
     "build:types": "dts-bundle-generator --config ./dts-bundle-generator.config.ts",
+    "doc": "typedoc --out docs --plugin typedoc-github-theme --theme typedoc-github-theme src",
     "prepare": "husky",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\""
@@ -47,6 +48,8 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "thirdweb": "^5.43.2",
+    "typedoc": "^0.26.5",
+    "typedoc-github-theme": "^0.1.1",
     "uuid": "^10.0.0"
   },
   "devDependencies": {

@@ -11,6 +11,14 @@ const log = childLogger("connection");
 type AsyncClientFn = (client: Client, session: Session) => Promise<any>;
 
 export interface IConnectionService {
+  get isConnected(): boolean;
+
+  init(deviceId: string): void;
+  connect(): Promise<void>;
+  disconnect(): void;
+
+  join(matchId: string, meta: Kv<string>, retries: number): Promise<Match>;
+  leave(): Promise<void>;
   sendMatchState(
     matchId: string,
     opCode: number,
@@ -73,7 +81,7 @@ export class ConnectionService implements IConnectionService, IRpcService {
     );
   }
 
-  init(deviceId: string) {
+  init(deviceId: string): void {
     if (this._deviceId) {
       // safely return if already initialized with the same parameters
       if (this._deviceId === deviceId) {
