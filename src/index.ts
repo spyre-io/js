@@ -29,5 +29,11 @@ export {
   useConnectionService,
   useIsConnected,
 } from "./react/hooks/use-connection";
+export {
+  useAccount,
+  useAccountBalances,
+  useAccountWalletAddress,
+} from "./react/hooks/use-account";
+export {useActiveAddress, useIsWalletConnected} from "./react/hooks/use-web3";
 
 // redux?

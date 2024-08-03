@@ -1,4 +1,4 @@
-import {Client, Match, Session, Socket} from "@heroiclabs/nakama-js";
+import {Client, ISession, Match, Session, Socket} from "@heroiclabs/nakama-js";
 import {getBackoffMs, waitMs} from "../util/net";
 import {childLogger} from "../util/logger";
 import {v4} from "uuid";
@@ -8,7 +8,11 @@ import {INotificationService} from "../notifications/service";
 
 const log = childLogger("connection");
 
-type AsyncClientFn = (client: Client, session: Session) => Promise<any>;
+type AsyncClientFn<T> = (client: Client, session: Session) => Promise<T>;
+
+export interface INakamaClientService {
+  getApi<T>(fn: AsyncClientFn<T>, retries: number): Promise<T>;
+}
 
 export interface IConnectionService {
   get isConnected(): boolean;
@@ -39,7 +43,9 @@ export interface IRpcService {
 
 type ParsedApiRpc = ApiRpc & {payload: any};
 
-export class ConnectionService implements IConnectionService, IRpcService {
+export class ConnectionService
+  implements IConnectionService, IRpcService, INakamaClientService
+{
   // set on construction
   _isSecure: boolean;
   _client: Client;
@@ -151,11 +157,21 @@ export class ConnectionService implements IConnectionService, IRpcService {
           // deletes the cache entry
           delete this._requestCache[key];
 
-          log.debug("Rpc end [@Uuid] <-- @RPC: @Response", uuid, id, res);
+          log.debug(
+            "Rpc end [@Uuid] <-- @RPC: @Response",
+            uuid,
+            id,
+            res.payload,
+          );
+
+          const payload = JSON.parse(res.payload || "{}");
+          if (payload.error) {
+            throw new Error(payload.error);
+          }
 
           return {
-            ...res,
-            payload: JSON.parse(res.payload || "{}"),
+            id: res.id,
+            ...payload,
           };
         })
         .catch((error) => {
@@ -266,7 +282,7 @@ export class ConnectionService implements IConnectionService, IRpcService {
     }
   }
 
-  async getApi(fn: AsyncClientFn, retries: number = 0): Promise<any> {
+  async getApi<T>(fn: AsyncClientFn<T>, retries: number = 0): Promise<T> {
     if (retries > 5) {
       throw new Error("Too many retries.");
     }

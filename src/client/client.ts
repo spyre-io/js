@@ -77,10 +77,14 @@ class SpyreClient implements ISpyreClient {
 export function createSpyreClient(
   options: CreateSpyreClientOptions,
 ): SpyreClient {
-  const account = new AccountService();
   const notifications = new NotificationService();
   const leaderboards = new LeaderboardService();
   const connection = new ConnectionService(notifications);
+
+  // todo: fix circular dependency
+  notifications.init(connection);
+
+  const account = new AccountService(connection);
 
   const chain = options.web3.chainId === 8432 ? base : baseSepoliaTestnet;
   const web3 = new ThirdWebWeb3Service({
