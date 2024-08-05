@@ -22,6 +22,8 @@ import {
   ILeaderboardService,
   LeaderboardService,
 } from "../core/leaderboards/service";
+import {ThirdwebClient} from "thirdweb";
+import {ConnectionManager} from "thirdweb/wallets";
 
 export type CreateSpyreClientOptions = {
   web3: Web3Config;
@@ -76,6 +78,8 @@ class SpyreClient implements ISpyreClient {
 
 export function createSpyreClient(
   options: CreateSpyreClientOptions,
+  thirdweb: ThirdwebClient,
+  connectionManager: ConnectionManager,
 ): SpyreClient {
   const notifications = new NotificationService();
   const leaderboards = new LeaderboardService();
@@ -86,11 +90,12 @@ export function createSpyreClient(
 
   const account = new AccountService(connection);
 
-  const chain = options.web3.chainId === 8432 ? base : baseSepoliaTestnet;
-  const web3 = new ThirdWebWeb3Service({
-    ...options.web3,
-    network: chain,
-  });
+  const web3 = new ThirdWebWeb3Service(
+    options.web3,
+    account,
+    thirdweb,
+    connectionManager,
+  );
   const multiplayer = new MultiplayerService(
     connection,
     account,

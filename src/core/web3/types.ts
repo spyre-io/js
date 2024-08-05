@@ -1,4 +1,10 @@
+import {AppMetadata} from "thirdweb/dist/types/wallets/types";
+
 export type Web3Config = {
+  thirdweb: {
+    clientId: string;
+    metadata: AppMetadata;
+  };
   name: string;
   chainId: number;
   contracts: {[name: string]: ContractConfig};

@@ -1,6 +1,6 @@
 import {waitFor} from "./time";
 
-type AsyncOp = {
+export type AsyncOp = {
   isInProgress: boolean;
   isStarted: boolean;
   isComplete: boolean;

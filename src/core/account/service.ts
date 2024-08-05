@@ -1,6 +1,7 @@
 import {ApiAccount} from "@heroiclabs/nakama-js/dist/api.gen";
-import {INakamaClientService} from "core/net/service";
-import {Kv} from "core/shared/types";
+import {INakamaClientService} from "../net/service";
+import {Kv} from "../shared/types";
+import {logger} from "../util/logger";
 
 export class User {
   avatarUrl?: string;
@@ -13,7 +14,7 @@ export class User {
   online?: boolean;
   timezone?: string;
   username?: string;
-  walletAddr?: string;
+  walletAddr: `0x${string}` | null = null;
 }
 
 export interface IAccountService {
@@ -31,6 +32,20 @@ const getUser = (account: ApiAccount): User => {
     throw new Error("Invalid account");
   }
 
+  // verified address
+  let walletAddr: `0x${string}` | null = null;
+  if (account.custom_id) {
+    if (account.custom_id.startsWith("0x")) {
+      walletAddr = account.custom_id as `0x${string}`;
+    } else {
+      logger.warn(
+        "Invalid wallet address, '@WalletAddress' for user @UserId.",
+        account.custom_id,
+        user.id,
+      );
+    }
+  }
+
   return {
     avatarUrl: user.avatar_url,
     createTime: user.create_time,
@@ -42,7 +57,7 @@ const getUser = (account: ApiAccount): User => {
     online: user.online,
     timezone: user.timezone,
     username: user.username,
-    walletAddr: account.custom_id,
+    walletAddr: walletAddr,
   };
 };
 
