@@ -3,20 +3,7 @@ import {INakamaClientService} from "../net/service";
 import {Kv, WatchedValue} from "../shared/types";
 import {logger} from "../util/logger";
 import {Web3Address} from "../web3/types";
-
-export class User {
-  avatarUrl?: string;
-  createTime?: string;
-  displayName?: string;
-  id?: string;
-  lang_tag?: string;
-  location?: string;
-  metadata?: string;
-  online?: boolean;
-  timezone?: string;
-  username?: string;
-  walletAddr: Web3Address | null = null;
-}
+import {User} from "./types";
 
 export const NullUser = {
   walletAddr: null,
@@ -25,7 +12,7 @@ export const NullUser = {
 export interface IAccountService {
   get user(): WatchedValue<User>;
   get balances(): WatchedValue<Kv<BigInt>>;
-  get meta(): WatchedValue<Kv<any>>;
+  get meta(): WatchedValue<object>;
 
   refresh(): Promise<void>;
   update(user: User): Promise<void>;
@@ -84,7 +71,7 @@ export class AccountService implements IAccountService {
   public readonly balances: WatchedValue<Kv<BigInt>> = new WatchedValue<
     Kv<BigInt>
   >({});
-  public readonly meta: WatchedValue<Kv<any>> = new WatchedValue<Kv<any>>({});
+  public readonly meta: WatchedValue<object> = new WatchedValue<object>({});
 
   constructor(private readonly _nakama: INakamaClientService) {
     //

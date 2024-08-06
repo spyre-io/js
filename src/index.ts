@@ -16,8 +16,21 @@ export {fromWei} from "./core/web3/helpers";
 export {createSpyreClient} from "./client/client";
 export type {ISpyreClient, CreateSpyreClientOptions} from "./client/client";
 
+// core/account
+export type {User} from "./core/account/types";
+
+// core/web3
+export type {
+  Web3Address,
+  Web3ConnectionStatus,
+  Web3Config,
+  ContractConfig,
+  Signature,
+  SignStakeParameters,
+} from "./core/web3/types";
+
 // react
-export {SpyreClientProvider} from "./react/client-provider";
+export {SpyreClientProvider, SpyreConnect} from "./react/client-provider";
 
 // react/hooks
 export {useClient} from "./react/hooks/use-client";
@@ -26,21 +39,31 @@ export {
   useNotificationService,
   useLeaderboardService,
 } from "./react/hooks/use-services";
+
+// react/hooks/connection
 export {
   useConnectionService,
   useIsConnected,
 } from "./react/hooks/use-connection";
+
+// react/hooks/account
 export {
   useAccount,
   useAccountBalances,
   useAccountCoins,
   useAccountWalletAddress,
+  useAccountMetadata,
   useAccountRefresh,
   useAccountUpdate,
 } from "./react/hooks/use-account";
+
+// react/hooks/web3
 export {
-  useWeb3ActiveAddress,
+  useWeb3ConnectionStatus,
   useWeb3IsWalletConnected,
+  useWeb3IsWalletConnectedAndLinked,
+  useWeb3ActiveAddress,
+  useWeb3LinkedAddress,
   useWeb3StakingBalance,
   useWeb3StakingBalanceFetch,
   useWeb3UsdcBalance,

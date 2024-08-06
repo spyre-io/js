@@ -6,9 +6,15 @@ import {useAccountWalletAddress} from "./use-account";
 import {useClient} from "./use-client";
 import {useCallback, useSyncExternalStore} from "react";
 
-export const useWeb3ActiveAddress = () => useActiveAccount()?.address;
+export const useWeb3ConnectionStatus = () => useActiveWalletConnectionStatus();
 
 export const useWeb3IsWalletConnected = () => {
+  const status = useActiveWalletConnectionStatus();
+
+  return status === "connected";
+};
+
+export const useWeb3IsWalletConnectedAndLinked = () => {
   const status = useActiveWalletConnectionStatus();
   const connectedAddress = useWeb3ActiveAddress();
   const accountAddress = useAccountWalletAddress();
@@ -19,6 +25,18 @@ export const useWeb3IsWalletConnected = () => {
     accountAddress &&
     connectedAddress === accountAddress
   );
+};
+
+export const useWeb3ActiveAddress = () => {
+  const address = useClient().web3.activeAddress;
+
+  return useSyncExternalStore(address.watch, address.getValue);
+};
+
+export const useWeb3LinkedAddress = () => {
+  const address = useClient().web3.linkedAddress;
+
+  return useSyncExternalStore(address.watch, address.getValue);
 };
 
 export const useWeb3StakingBalance = () => {

@@ -49,7 +49,7 @@ export interface IWeb3Service {
 }
 
 export class ThirdWebWeb3Service implements IWeb3Service {
-  _network: Chain;
+  public readonly network: Chain;
 
   _status: WatchedValue<Web3ConnectionStatus> =
     new WatchedValue<Web3ConnectionStatus>("disconnected");
@@ -75,7 +75,7 @@ export class ThirdWebWeb3Service implements IWeb3Service {
   constructor(
     public readonly config: Web3Config,
     private readonly _account: IAccountService,
-    _client: ThirdwebClient,
+    public readonly thirdweb: ThirdwebClient,
     private readonly _connectionManager: ConnectionManager,
   ) {
     if (!config.contracts["staking"]) {
@@ -86,18 +86,18 @@ export class ThirdWebWeb3Service implements IWeb3Service {
       throw new Error("Missing usdc contract");
     }
 
-    this._network = config.chainId === 8432 ? base : baseSepolia;
+    this.network = config.chainId === 8432 ? base : baseSepolia;
 
     // load contracts
     this.stakingContract = getContract({
-      client: _client,
-      chain: this._network,
+      client: thirdweb,
+      chain: this.network,
       address: config.contracts.staking.addr,
       abi: config.contracts.staking.abi,
     });
     this.usdcContract = getContract({
-      client: _client,
-      chain: this._network,
+      client: thirdweb,
+      chain: this.network,
       address: config.contracts.usdc.addr,
       abi: config.contracts.usdc.abi,
     });
@@ -174,11 +174,11 @@ export class ThirdWebWeb3Service implements IWeb3Service {
 
     const thirdwebActiveChain = this._connectionManager.activeWalletChainStore;
     this._needsToSwitchChains.setValue(
-      thirdwebActiveChain.getValue()?.id !== this._network.id,
+      thirdwebActiveChain.getValue()?.id !== this.network.id,
     );
     thirdwebActiveChain.subscribe(() => {
       this._needsToSwitchChains.setValue(
-        thirdwebActiveChain.getValue()?.id !== this._network.id,
+        thirdwebActiveChain.getValue()?.id !== this.network.id,
       );
     });
 
@@ -206,7 +206,7 @@ export class ThirdWebWeb3Service implements IWeb3Service {
   }
 
   async switchChain(): Promise<void> {
-    await this._connectionManager.switchActiveWalletChain(this._network);
+    await this._connectionManager.switchActiveWalletChain(this.network);
   }
 
   async signStake({
@@ -231,7 +231,7 @@ export class ThirdWebWeb3Service implements IWeb3Service {
     }
 
     const domain = getStakingDomain({
-      chainId: this._network.id,
+      chainId: this.network.id,
       contractAddr: this.config.contracts["staking"].addr,
       name: this.config.name,
       version: "2",

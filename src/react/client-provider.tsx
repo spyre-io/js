@@ -7,10 +7,15 @@ import {
 import {createContext, PropsWithChildren, useMemo} from "react";
 import {
   AutoConnect,
+  ConnectEmbed,
+  darkTheme,
+  Theme,
   ThirdwebProvider,
   useConnectionManager,
 } from "thirdweb/react";
 import {createThirdwebClient, ThirdwebClient} from "thirdweb";
+import {useClient} from "./hooks/use-client";
+import {ThirdWebWeb3Service} from "../core/web3/service";
 
 export const SpyreClientCtx = createContext<ISpyreClient | undefined>(
   undefined,
@@ -70,5 +75,36 @@ function ThirdwebContextWrapper(
     <SpyreClientCtx.Provider value={client}>
       {props.children}
     </SpyreClientCtx.Provider>
+  );
+}
+
+const defaultTheme = darkTheme({
+  colors: {
+    modalBg: "rgb(23,30,45)",
+    borderColor: "rgba(255, 255, 255, 0.5)",
+    accentButtonBg: "rgb(41, 27, 146)",
+    secondaryText: "rgb(138, 146, 159)",
+    accentText: "rgb(255, 255, 255)",
+    secondaryIconHoverColor: "rgb(255, 255, 255)",
+    secondaryIconHoverBg: "rgba(255, 255, 255, 0.5)",
+    secondaryButtonHoverBg: "rgba(255, 255, 255, 0.5)",
+  },
+});
+
+export function SpyreConnect({theme}: {theme?: Theme}) {
+  const client = useClient();
+  const thirdwebService = client.web3 as ThirdWebWeb3Service;
+  const thirdweb = thirdwebService.thirdweb;
+
+  return (
+    <ConnectEmbed
+      client={thirdweb}
+      wallets={wallets}
+      theme={theme || defaultTheme}
+      modalSize="compact"
+      chain={thirdwebService.network}
+      showThirdwebBranding={false}
+      appMetadata={thirdwebService.config.thirdweb.metadata}
+    />
   );
 }
