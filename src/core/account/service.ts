@@ -1,7 +1,8 @@
 import {ApiAccount} from "@heroiclabs/nakama-js/dist/api.gen";
 import {INakamaClientService} from "../net/service";
-import {Kv} from "../shared/types";
+import {Kv, WatchedValue} from "../shared/types";
 import {logger} from "../util/logger";
+import {Web3Address} from "../web3/types";
 
 export class User {
   avatarUrl?: string;
@@ -14,13 +15,17 @@ export class User {
   online?: boolean;
   timezone?: string;
   username?: string;
-  walletAddr: `0x${string}` | null = null;
+  walletAddr: Web3Address | null = null;
 }
 
+export const NullUser = {
+  walletAddr: null,
+};
+
 export interface IAccountService {
-  get user(): User | null;
-  get balances(): Kv<BigInt>;
-  get meta(): Kv<any>;
+  get user(): WatchedValue<User>;
+  get balances(): WatchedValue<Kv<BigInt>>;
+  get meta(): WatchedValue<Kv<any>>;
 
   refresh(): Promise<void>;
   update(user: User): Promise<void>;
@@ -33,7 +38,7 @@ const getUser = (account: ApiAccount): User => {
   }
 
   // verified address
-  let walletAddr: `0x${string}` | null = null;
+  let walletAddr: Web3Address | null = null;
   if (account.custom_id) {
     if (account.custom_id.startsWith("0x")) {
       walletAddr = account.custom_id as `0x${string}`;
@@ -75,39 +80,29 @@ const getBalances = (account: ApiAccount): Kv<BigInt> => {
 };
 
 export class AccountService implements IAccountService {
-  private _user: User | null = null;
-  private _balances: Kv<BigInt> = {};
-  private _meta: Kv<any> = {};
+  public readonly user: WatchedValue<User> = new WatchedValue<User>(NullUser);
+  public readonly balances: WatchedValue<Kv<BigInt>> = new WatchedValue<
+    Kv<BigInt>
+  >({});
+  public readonly meta: WatchedValue<Kv<any>> = new WatchedValue<Kv<any>>({});
 
   constructor(private readonly _nakama: INakamaClientService) {
     //
-  }
-
-  get user(): User | null {
-    return this._user;
-  }
-
-  get balances(): Kv<BigInt> {
-    return this._balances;
-  }
-
-  get meta(): Kv<any> {
-    return this._meta;
   }
 
   async refresh(): Promise<void> {
     await this._nakama.getApi(async (client, session) => {
       const account = await client.getAccount(session);
 
-      this._user = getUser(account);
-      this._balances = getBalances(account);
-      this._meta = account.user?.metadata
-        ? JSON.parse(account.user.metadata)
-        : {};
+      this.user.setValue(getUser(account));
+      this.balances.setValue(getBalances(account));
+      this.meta.setValue(
+        account.user?.metadata ? JSON.parse(account.user.metadata) : {},
+      );
     }, 3);
   }
 
   async update(user: User): Promise<void> {
-    //
+    throw new Error("Not implemented");
   }
 }

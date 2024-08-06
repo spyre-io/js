@@ -6,6 +6,9 @@ export {runFor, waitFor} from "./core/util/time";
 export {asyncOps, repeatAsync} from "./core/util/async";
 export {getBackoffMs, waitMs} from "./core/util/net";
 
+// core/web3
+export {fromWei} from "./core/web3/helpers";
+
 // core/features/vault
 //export {getVaultValue, isVaultFull} from "./core/features/vaults/helpers";
 
@@ -19,10 +22,8 @@ export {SpyreClientProvider} from "./react/client-provider";
 // react/hooks
 export {useClient} from "./react/hooks/use-client";
 export {
-  useAccountService,
   useMultiplayerService,
   useNotificationService,
-  useWeb3Service,
   useLeaderboardService,
 } from "./react/hooks/use-services";
 export {
@@ -32,8 +33,21 @@ export {
 export {
   useAccount,
   useAccountBalances,
+  useAccountCoins,
   useAccountWalletAddress,
+  useAccountRefresh,
+  useAccountUpdate,
 } from "./react/hooks/use-account";
-export {useActiveAddress, useIsWalletConnected} from "./react/hooks/use-web3";
+export {
+  useWeb3ActiveAddress,
+  useWeb3IsWalletConnected,
+  useWeb3StakingBalance,
+  useWeb3StakingBalanceFetch,
+  useWeb3UsdcBalance,
+  useWeb3UsdcBalanceFetch,
+  useWeb3NeedsSwitchChain,
+  useWeb3SwitchChain,
+  useWeb3RefreshBalances,
+} from "./react/hooks/use-web3";
 
 // redux?

@@ -3,21 +3,25 @@ import {
   SigningErrorType,
   SigniningError,
   SignStakeParameters,
+  Web3Address,
   Web3Config,
+  Web3ConnectionStatus,
 } from "./types";
 
 import {getRSV, getStakingDomain, getStakingTypes} from "./helpers";
 import {base, baseSepolia, Chain} from "thirdweb/chains";
-import {Account, ConnectionManager} from "thirdweb/wallets";
+import {ConnectionManager} from "thirdweb/wallets";
 import {
   getContract,
   readContract,
   ThirdwebClient,
   ThirdwebContract,
 } from "thirdweb";
-import {AsyncOp, asyncOps} from "../util/async";
+import {asyncOps} from "../util/async";
 import {IAccountService} from "../account/service";
 import {ReadContractResult} from "thirdweb/dist/types/transaction/read-contract";
+import {WatchedValue, AsyncValue, SpyreError} from "../shared/types";
+import {SpyreErrorCode} from "../shared/errors";
 
 /*export const useHangmanDomain = () => {
   const params = useWeb3Contants();
@@ -29,18 +33,12 @@ import {ReadContractResult} from "thirdweb/dist/types/transaction/read-contract"
   };
 };*/
 
-type AsyncValue<T> = {
-  value: T;
-  fetch: AsyncOp;
-  refresh: () => Promise<void>;
-};
-
 export interface IWeb3Service {
   get config(): Web3Config;
-  get status(): "connected" | "disconnected" | "connecting";
-  get address(): `0x${string}` | null;
-  get chainId(): number;
-  get needsToSwitchChains(): boolean;
+  get status(): WatchedValue<Web3ConnectionStatus>;
+  get activeAddress(): WatchedValue<Web3Address | null>;
+  get linkedAddress(): WatchedValue<Web3Address | null>;
+  get needsToSwitchChains(): WatchedValue<boolean>;
 
   get stakingBalance(): AsyncValue<BigInt>;
   get usdcBalance(): AsyncValue<BigInt>;
@@ -52,14 +50,23 @@ export interface IWeb3Service {
 
 export class ThirdWebWeb3Service implements IWeb3Service {
   _network: Chain;
-  _stakingContract: ThirdwebContract<any>;
-  _usdcContract: ThirdwebContract<any>;
 
-  _stakingBalance: AsyncValue<BigInt>;
-  _usdcBalance: AsyncValue<BigInt>;
-  _withdrawAfter: AsyncValue<Date> = {
-    value: new Date(),
-    fetch: asyncOps.new(),
+  _status: WatchedValue<Web3ConnectionStatus> =
+    new WatchedValue<Web3ConnectionStatus>("disconnected");
+  _activeAddress: WatchedValue<Web3Address | null> =
+    new WatchedValue<Web3Address | null>(null);
+  _linkedAddress: WatchedValue<Web3Address | null> =
+    new WatchedValue<Web3Address | null>(null);
+  _needsToSwitchChains: WatchedValue<boolean> = new WatchedValue(false);
+
+  public readonly stakingContract: ThirdwebContract<any>;
+  public readonly usdcContract: ThirdwebContract<any>;
+
+  public readonly stakingBalance: AsyncValue<BigInt>;
+  public readonly usdcBalance: AsyncValue<BigInt>;
+  public readonly withdrawAfter: AsyncValue<Date> = {
+    value: new WatchedValue(new Date()),
+    fetch: new WatchedValue(asyncOps.new()),
     refresh: async () => {
       throw new Error("Not implemented");
     },
@@ -68,7 +75,7 @@ export class ThirdWebWeb3Service implements IWeb3Service {
   constructor(
     public readonly config: Web3Config,
     private readonly _account: IAccountService,
-    private readonly _client: ThirdwebClient,
+    _client: ThirdwebClient,
     private readonly _connectionManager: ConnectionManager,
   ) {
     if (!config.contracts["staking"]) {
@@ -82,13 +89,13 @@ export class ThirdWebWeb3Service implements IWeb3Service {
     this._network = config.chainId === 8432 ? base : baseSepolia;
 
     // load contracts
-    this._stakingContract = getContract({
+    this.stakingContract = getContract({
       client: _client,
       chain: this._network,
       address: config.contracts.staking.addr,
       abi: config.contracts.staking.abi,
     });
-    this._usdcContract = getContract({
+    this.usdcContract = getContract({
       client: _client,
       chain: this._network,
       address: config.contracts.usdc.addr,
@@ -96,92 +103,106 @@ export class ThirdWebWeb3Service implements IWeb3Service {
     });
 
     // setup async values
-    this._stakingBalance = {
-      value: BigInt(0),
-      fetch: asyncOps.new(),
+    this.stakingBalance = {
+      value: new WatchedValue<BigInt>(BigInt(0)),
+      fetch: new WatchedValue(asyncOps.new()),
       refresh: async () => {
-        this._stakingBalance.fetch = asyncOps.inProgress();
+        this.stakingBalance.fetch.setValue(asyncOps.inProgress());
 
         let result: ReadContractResult<any>;
         try {
           result = await readContract({
-            contract: this._stakingContract,
+            contract: this.stakingContract,
             method: "balances",
-            params: [this._account.user?.walletAddr],
+            params: [this._account.user.getValue()?.walletAddr],
           });
         } catch (error) {
-          this._stakingBalance.fetch = asyncOps.failure(error);
+          this.stakingBalance.fetch.setValue(asyncOps.failure(error));
 
           return;
         }
 
-        this._stakingBalance.value = result.value;
-        this._stakingBalance.fetch = asyncOps.success();
+        this.stakingBalance.value.setValue(result.value);
+        this.stakingBalance.fetch.setValue(asyncOps.success());
       },
     };
 
-    this._usdcBalance = {
-      value: BigInt(0),
-      fetch: asyncOps.new(),
+    this.usdcBalance = {
+      value: new WatchedValue<BigInt>(BigInt(0)),
+      fetch: new WatchedValue(asyncOps.new()),
       refresh: async () => {
-        this._usdcBalance.fetch = asyncOps.inProgress();
+        this.usdcBalance.fetch.setValue(asyncOps.inProgress());
 
         let result: ReadContractResult<any>;
         try {
           result = await readContract({
-            contract: this._usdcContract,
+            contract: this.usdcContract,
             method: "balanceOf",
-            params: [this._account.user?.walletAddr],
+            params: [this._account.user.getValue()?.walletAddr],
           });
         } catch (error) {
-          this._usdcBalance.fetch = asyncOps.failure(error);
+          this.usdcBalance.fetch.setValue(asyncOps.failure(error));
 
           return;
         }
 
-        this._usdcBalance.value = result.value;
-        this._usdcBalance.fetch = asyncOps.success();
+        this.usdcBalance.value.setValue(result.value);
+        this.usdcBalance.fetch.setValue(asyncOps.success());
       },
     };
-  }
 
-  get status(): "connected" | "disconnected" | "connecting" {
-    return this._connectionManager.activeWalletConnectionStatusStore.getValue();
-  }
+    // listen to thirdweb
+    const thirdwebConnectionStatus =
+      this._connectionManager.activeWalletConnectionStatusStore;
+    this._status.setValue(thirdwebConnectionStatus.getValue());
+    thirdwebConnectionStatus.subscribe(() => {
+      const status = thirdwebConnectionStatus.getValue();
+      this._status.setValue(
+        status === "connected" ? "connected" : "disconnected",
+      );
+    });
 
-  get address(): `0x${string}` | null {
-    if (!this._account.user) {
-      return null;
-    }
-
-    return this._account.user.walletAddr;
-  }
-
-  get chainId(): number {
-    return this._network.id;
-  }
-
-  get needsToSwitchChains(): boolean {
-    return (
-      this._connectionManager.activeWalletChainStore.getValue()?.id !==
-      this.chainId
+    const thirdwebActiveAccount = this._connectionManager.activeAccountStore;
+    this._activeAddress.setValue(
+      (thirdwebActiveAccount.getValue()?.address as Web3Address) || null,
     );
+    thirdwebActiveAccount.subscribe(() => {
+      this._activeAddress.setValue(
+        (thirdwebActiveAccount.getValue()?.address as Web3Address) || null,
+      );
+    });
+
+    const thirdwebActiveChain = this._connectionManager.activeWalletChainStore;
+    this._needsToSwitchChains.setValue(
+      thirdwebActiveChain.getValue()?.id !== this._network.id,
+    );
+    thirdwebActiveChain.subscribe(() => {
+      this._needsToSwitchChains.setValue(
+        thirdwebActiveChain.getValue()?.id !== this._network.id,
+      );
+    });
+
+    // listen to account
+    this._linkedAddress.setValue(this._account.user.getValue().walletAddr);
+    _account.user.watch(() => {
+      this._linkedAddress.setValue(this._account.user.getValue().walletAddr);
+    });
   }
 
-  get stakingBalance(): AsyncValue<BigInt> {
-    return this._stakingBalance;
+  get status(): WatchedValue<Web3ConnectionStatus> {
+    return this._status;
   }
 
-  get usdcBalance(): AsyncValue<BigInt> {
-    return this._usdcBalance;
+  get needsToSwitchChains(): WatchedValue<boolean> {
+    return this._needsToSwitchChains;
   }
 
-  get withdrawAfter(): AsyncValue<Date> {
-    return this._withdrawAfter;
+  get activeAddress(): WatchedValue<Web3Address | null> {
+    return this._activeAddress;
   }
 
-  get account(): Account | null {
-    return null;
+  get linkedAddress(): WatchedValue<Web3Address | null> {
+    return this._linkedAddress;
   }
 
   async switchChain(): Promise<void> {
@@ -194,15 +215,30 @@ export class ThirdWebWeb3Service implements IWeb3Service {
     amount,
     fee,
   }: SignStakeParameters): Promise<Signature> {
+    const account = this._connectionManager.activeAccountStore.getValue();
+    if (!account) {
+      throw new SpyreError(
+        SpyreErrorCode.FAILED_PRECONDITION,
+        "Wallet is not connected.",
+      );
+    }
+
+    if (this.linkedAddress.getValue() !== this.activeAddress.getValue()) {
+      throw new SpyreError(
+        SpyreErrorCode.FAILED_PRECONDITION,
+        "Connected wallet address is not linked to account.",
+      );
+    }
+
     const domain = getStakingDomain({
-      chainId: this.chainId,
+      chainId: this._network.id,
       contractAddr: this.config.contracts["staking"].addr,
       name: this.config.name,
       version: "2",
     });
     const types = {Stake: getStakingTypes()};
     const stake = {
-      user: this.address,
+      user: this.activeAddress.getValue(),
       nonce,
       expiry,
       amount,
@@ -211,7 +247,7 @@ export class ThirdWebWeb3Service implements IWeb3Service {
 
     let result;
     try {
-      result = await this.account!.signTypedData({
+      result = await account.signTypedData({
         domain,
         types,
         primaryType: "Stake",

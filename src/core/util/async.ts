@@ -1,14 +1,5 @@
+import {AsyncOp} from "../shared/types";
 import {waitFor} from "./time";
-
-export type AsyncOp = {
-  isInProgress: boolean;
-  isStarted: boolean;
-  isComplete: boolean;
-  isSuccess: boolean;
-  isFailure: boolean;
-  error: any;
-  lastUpdated: number;
-};
 
 export const asyncOps = {
   new: (): AsyncOp => ({
