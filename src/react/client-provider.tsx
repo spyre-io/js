@@ -22,7 +22,8 @@ export const SpyreClientCtx = createContext<ISpyreClient | undefined>(
   undefined,
 );
 
-const wallets = [
+// not exported in index.ts
+export const wallets = [
   createWallet("io.metamask"),
   createWallet("com.coinbase.wallet"),
   inAppWallet({
@@ -82,7 +83,8 @@ function ThirdwebContextWrapper(
   );
 }
 
-const defaultTheme = darkTheme({
+// not exported in index.ts
+export const defaultTheme = darkTheme({
   colors: {
     modalBg: "rgb(23,30,45)",
     borderColor: "rgba(255, 255, 255, 0.5)",

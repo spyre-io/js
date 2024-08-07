@@ -36,7 +36,7 @@ import {
   CancelToken,
 } from "../shared/types";
 import {SpyreErrorCode} from "../shared/errors";
-import {IRpcService} from "core/net/service";
+import {IRpcService} from "../../core/net/service";
 import {DepositResponse, GetNonceResponse, PermitResponse} from "./types.gen";
 
 /*export const useHangmanDomain = () => {
@@ -59,8 +59,8 @@ export interface IWeb3Service {
   get needsToSwitchChains(): WatchedValue<boolean>;
 
   // balance
-  get stakingBalance(): WatchedAsyncValue<BigInt>;
-  get usdcBalance(): WatchedAsyncValue<BigInt>;
+  get stakingBalance(): WatchedAsyncValue<bigint>;
+  get usdcBalance(): WatchedAsyncValue<bigint>;
 
   // withdrawal
   get withdrawAfter(): WatchedAsyncValue<Date>;
@@ -71,9 +71,9 @@ export interface IWeb3Service {
     cancel?: CancelToken,
   ): Promise<Signature>;
 
-  requiresApproval(wad: BigInt, cancel?: CancelToken): Promise<boolean>;
-  approve(wad?: BigInt, cancel?: CancelToken): Promise<Txn>;
-  deposit(amount: BigInt, cancel?: CancelToken): Promise<Txn>;
+  requiresApproval(wad: bigint, cancel?: CancelToken): Promise<boolean>;
+  approve(wad?: bigint, cancel?: CancelToken): Promise<Txn>;
+  deposit(amount: bigint, cancel?: CancelToken): Promise<Txn>;
 }
 
 export class ThirdWebWeb3Service implements IWeb3Service {
@@ -90,8 +90,8 @@ export class ThirdWebWeb3Service implements IWeb3Service {
   public readonly stakingContract: ThirdwebContract<any>;
   public readonly usdcContract: ThirdwebContract<any>;
 
-  public readonly stakingBalance: WatchedAsyncValue<BigInt>;
-  public readonly usdcBalance: WatchedAsyncValue<BigInt>;
+  public readonly stakingBalance: WatchedAsyncValue<bigint>;
+  public readonly usdcBalance: WatchedAsyncValue<bigint>;
   public readonly withdrawAfter: WatchedAsyncValue<Date> = {
     value: new WatchedValue(new Date()),
     fetch: new WatchedValue(asyncOps.new()),
@@ -133,7 +133,7 @@ export class ThirdWebWeb3Service implements IWeb3Service {
 
     // setup async values
     this.stakingBalance = {
-      value: new WatchedValue<BigInt>(BigInt(0)),
+      value: new WatchedValue<bigint>(BigInt(0)),
       fetch: new WatchedValue(asyncOps.new()),
       refresh: async () => {
         this.stakingBalance.fetch.setValue(asyncOps.inProgress());
@@ -143,7 +143,7 @@ export class ThirdWebWeb3Service implements IWeb3Service {
           result = await readContract({
             contract: this.stakingContract,
             method: "balances",
-            params: [this._account.user.getValue()?.walletAddr],
+            params: [this._account.user?.walletAddr],
           });
         } catch (error) {
           this.stakingBalance.fetch.setValue(asyncOps.failure(error));
@@ -157,7 +157,7 @@ export class ThirdWebWeb3Service implements IWeb3Service {
     };
 
     this.usdcBalance = {
-      value: new WatchedValue<BigInt>(BigInt(0)),
+      value: new WatchedValue<bigint>(BigInt(0)),
       fetch: new WatchedValue(asyncOps.new()),
       refresh: async () => {
         this.usdcBalance.fetch.setValue(asyncOps.inProgress());
@@ -167,7 +167,7 @@ export class ThirdWebWeb3Service implements IWeb3Service {
           result = await readContract({
             contract: this.usdcContract,
             method: "balanceOf",
-            params: [this._account.user.getValue()?.walletAddr],
+            params: [this._account.user?.walletAddr],
           });
         } catch (error) {
           this.usdcBalance.fetch.setValue(asyncOps.failure(error));
@@ -212,10 +212,10 @@ export class ThirdWebWeb3Service implements IWeb3Service {
     });
 
     // listen to account
-    this._linkedAddress.setValue(this._account.user.getValue().walletAddr);
-    _account.user.watch(() => {
-      this._linkedAddress.setValue(this._account.user.getValue().walletAddr);
+    this._account.onUpdate((user) => {
+      this._linkedAddress.setValue(user.walletAddr);
     });
+    this._linkedAddress.setValue(this._account.user.walletAddr);
   }
 
   get status(): WatchedValue<Web3ConnectionStatus> {
@@ -234,11 +234,11 @@ export class ThirdWebWeb3Service implements IWeb3Service {
     return this._linkedAddress;
   }
 
-  requiresApproval(wad: BigInt, cancel?: CancelToken): Promise<boolean> {
+  requiresApproval(wad: bigint, cancel?: CancelToken): Promise<boolean> {
     throw new Error("Method not implemented.");
   }
 
-  async approve(wad?: BigInt, cancel?: CancelToken): Promise<Txn> {
+  approve = async (wad?: bigint, cancel?: CancelToken): Promise<Txn> => {
     const account = this._connectionManager.activeAccountStore.getValue();
     if (!account) {
       throw new SpyreError(
@@ -338,9 +338,9 @@ export class ThirdWebWeb3Service implements IWeb3Service {
     // todo: WATCH txn
 
     return txn;
-  }
+  };
 
-  async deposit(wad: BigInt, cancel?: CancelToken): Promise<Txn> {
+  deposit = async (wad: bigint, cancel?: CancelToken): Promise<Txn> => {
     const account = this._connectionManager.activeAccountStore.getValue();
     if (!account) {
       throw new SpyreError(
@@ -427,16 +427,16 @@ export class ThirdWebWeb3Service implements IWeb3Service {
     // TODO: WATCH txn
 
     return txn;
-  }
+  };
 
-  async switchChain(): Promise<void> {
+  switchChain = async (): Promise<void> => {
     await this._connectionManager.switchActiveWalletChain(this.network);
-  }
+  };
 
-  async signStake(
+  signStake = async (
     {nonce, expiry, amount, fee}: SignStakeParameters,
     cancel?: CancelToken,
-  ): Promise<Signature> {
+  ): Promise<Signature> => {
     const account = this._connectionManager.activeAccountStore.getValue();
     if (!account) {
       throw new SpyreError(
@@ -505,5 +505,5 @@ export class ThirdWebWeb3Service implements IWeb3Service {
     }
 
     return getRSV(result);
-  }
+  };
 }

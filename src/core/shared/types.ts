@@ -48,14 +48,12 @@ export class SpyreError extends Error {
   }
 }
 export class WatchedValue<T> {
-  private _value: T;
-
   private _listeners: (() => void)[] = [];
   private _queuedToRemove: (() => void)[] = [];
   private _errors: any[] = [];
 
-  constructor(value: T) {
-    this._value = value;
+  constructor(private _value: T) {
+    //
   }
 
   getValue = () => this._value;

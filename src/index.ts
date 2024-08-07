@@ -1,4 +1,4 @@
-// core
+////////////////////////////////////////////////////////////////////////// core
 
 // core/util
 export {logger, childLogger, getHistory} from "./core/util/logger";
@@ -12,12 +12,11 @@ export {fromWei, toWei} from "./core/web3/helpers";
 // core/features/vault
 //export {getVaultValue, isVaultFull} from "./core/features/vaults/helpers";
 
-// client
-export {createSpyreClient} from "./client/client";
-export type {ISpyreClient, CreateSpyreClientOptions} from "./client/client";
-
 // core/account
 export type {User} from "./core/account/types";
+
+// core/shared
+export type {AsyncOp} from "./core/shared/types";
 
 // core/web3
 export type {
@@ -31,11 +30,19 @@ export type {
   Txn,
 } from "./core/web3/types";
 
-// react
+// client
+export {createSpyreClient} from "./client/client";
+export type {ISpyreClient, CreateSpyreClientOptions} from "./client/client";
+
+///////////////////////////////////////////////////////////////////////// react
 export {SpyreClientProvider, SpyreConnect} from "./react/client-provider";
 
+// react/components
+export {WalletConnection} from "./react/components/WalletConnection";
+export type {WalletConnectionProps} from "./react/components/WalletConnection";
+
 // react/hooks
-export {useClient} from "./react/hooks/use-client";
+export {useClient, useDeviceId} from "./react/hooks/use-client";
 export {
   useMultiplayerService,
   useNotificationService,
@@ -51,16 +58,13 @@ export {
 // react/hooks/account
 export {
   useAccount,
-  useAccountBalances,
-  useAccountCoins,
-  useAccountWalletAddress,
-  useAccountMetadata,
   useAccountRefresh,
   useAccountUpdate,
 } from "./react/hooks/use-account";
 
 // react/hooks/web3
 export {
+  useWeb3Config,
   useWeb3ConnectionStatus,
   useWeb3IsWalletConnected,
   useWeb3IsWalletConnectedAndLinked,

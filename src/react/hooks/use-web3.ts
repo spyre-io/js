@@ -1,17 +1,31 @@
 import {useActiveWalletConnectionStatus} from "thirdweb/react";
-import {useAccountWalletAddress} from "./use-account";
+import {useAccount} from "./use-account";
 import {useClient} from "./use-client";
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-  useSyncExternalStore,
-} from "react";
+import {useCallback, useSyncExternalStore} from "react";
 import {Web3Address} from "../../core/web3/types";
-import {AsyncOp, AsyncValue, newCancelToken} from "../../core/shared/types";
-import {asyncOps} from "../../core/util/async";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
+import {ThirdWebWeb3Service} from "core/web3/service";
+
+// not exported in index
+export const useWeb3Thirdweb = () => {
+  const web3 = useClient().web3;
+
+  return (web3 as ThirdWebWeb3Service).thirdweb;
+};
+
+export const useWeb3ThirdwebNetwork = () => {
+  const web3 = useClient().web3;
+
+  return (web3 as ThirdWebWeb3Service).network;
+};
+
+// exported
+
+export const useWeb3Config = () => {
+  const web3 = useClient().web3;
+
+  return web3.config;
+};
 
 export const useWeb3ConnectionStatus = () => useActiveWalletConnectionStatus();
 
@@ -24,13 +38,12 @@ export const useWeb3IsWalletConnected = () => {
 export const useWeb3IsWalletConnectedAndLinked = () => {
   const status = useActiveWalletConnectionStatus();
   const connectedAddress = useWeb3ActiveAddress();
-  const accountAddress = useAccountWalletAddress();
+  const {data: account} = useAccount();
 
   return (
     status === "connected" &&
     connectedAddress &&
-    accountAddress &&
-    connectedAddress === accountAddress
+    connectedAddress === account.walletAddr
   );
 };
 
@@ -112,7 +125,7 @@ export const useWeb3SwitchChain = (): (() => Promise<void>) => {
   return web3.switchChain;
 };
 
-export const useWeb3RequiresApproval = (wad: BigInt) => {
+export const useWeb3RequiresApproval = (wad: bigint) => {
   const web3 = useClient().web3;
   const addr = web3.linkedAddress.getValue();
 
@@ -127,7 +140,7 @@ export const useWeb3RequiresApproval = (wad: BigInt) => {
   });
 };
 
-export const useWeb3Approve = (wad: BigInt) => {
+export const useWeb3Approve = (wad: bigint) => {
   const web3 = useClient().web3;
   const addr = web3.linkedAddress.getValue();
   const queryClient = useQueryClient();
@@ -150,7 +163,7 @@ export const useWeb3Approve = (wad: BigInt) => {
   });
 };
 
-export const useWeb3Deposit = (wad: BigInt) => {
+export const useWeb3Deposit = (wad: bigint) => {
   const web3 = useClient().web3;
   const addr = web3.linkedAddress.getValue();
   const queryClient = useQueryClient();

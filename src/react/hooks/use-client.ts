@@ -1,5 +1,6 @@
-import {useContext} from "react";
+import {useContext, useMemo} from "react";
 import {SpyreClientCtx} from "../client-provider";
+import {getDeviceId} from "../../client/client";
 
 export const useClient = () => {
   const context = useContext(SpyreClientCtx);
@@ -8,4 +9,10 @@ export const useClient = () => {
   }
 
   return context;
+};
+
+export const useDeviceId = () => {
+  const deviceId = useMemo(() => getDeviceId(), []);
+
+  return deviceId;
 };

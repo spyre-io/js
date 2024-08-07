@@ -113,12 +113,16 @@ export const getRSV = (signature: string): Signature => ({
   v: "0x" + signature.substring(130, 132),
 });
 
-export const fromWei = (wad: BigInt, decimals = 6): number => {
+export const fromWei = (wad?: BigInt, decimals = 6): number => {
+  if (!wad) {
+    return 0;
+  }
+
   return Number(wad.toString()) / 10 ** decimals;
 };
 
-export const toWei = (wad: number): BigInt => {
-  if (wad === 0) {
+export const toWei = (wad?: number): BigInt => {
+  if (!wad || wad === 0) {
     return BigInt(0);
   }
 

@@ -1,3 +1,4 @@
+import {Kv} from "core/shared/types";
 import {Web3Address} from "../web3/types";
 
 export type User = {
@@ -11,5 +12,10 @@ export type User = {
   online?: boolean;
   timezone?: string;
   username?: string;
+
+  // derived
   walletAddr: Web3Address | null;
+  coins: Number;
+  balances: Kv<BigInt>;
+  meta: any;
 };

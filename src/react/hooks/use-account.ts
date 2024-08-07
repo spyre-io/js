@@ -1,50 +1,41 @@
-import {useCallback, useSyncExternalStore} from "react";
+import {useCallback} from "react";
 import {useClient} from "./use-client";
 import {User} from "../../core/account/types";
+import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 
 export const useAccount = () => {
-  const user = useClient().account.user;
+  const account = useClient().account;
 
-  return useSyncExternalStore(user.watch, user.getValue);
-};
+  const query = useCallback(async () => {
+    await account.refresh();
 
-export const useAccountMetadata = () => {
-  const meta = useClient().account.meta;
+    return account.user;
+  }, [account]);
 
-  return useSyncExternalStore(meta.watch, meta.getValue);
-};
-
-export const useAccountBalances = () => {
-  const balances = useClient().account.balances;
-
-  return useSyncExternalStore(balances.watch, balances.getValue);
-};
-
-export const useAccountCoins = () => {
-  const balances = useAccountBalances();
-  const coins = balances.coins;
-  if (!coins) {
-    return 0;
-  }
-
-  return Number(coins);
-};
-
-export const useAccountWalletAddress = () => {
-  const user = useClient().account.user;
-  const cb = useCallback(() => user.getValue()?.walletAddr, [user]);
-
-  return useSyncExternalStore(user.watch, cb);
+  return useQuery({
+    queryKey: ["account"],
+    queryFn: query,
+  });
 };
 
 export const useAccountRefresh = () => {
-  const client = useClient();
+  const queryClient = useQueryClient();
 
-  return useCallback(() => client.account.refresh(), [client]);
+  return useCallback(
+    () => queryClient.invalidateQueries({queryKey: ["account"]}),
+    [queryClient],
+  );
 };
 
 export const useAccountUpdate = (user: User) => {
   const client = useClient();
 
-  return useCallback(() => client.account.update(user), [client, user]);
+  const query = useCallback(
+    async () => await client.account.update(user),
+    [client, user],
+  );
+
+  return useMutation({
+    mutationFn: query,
+  });
 };
