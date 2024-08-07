@@ -150,4 +150,25 @@ export const useWeb3Approve = (wad: BigInt) => {
   });
 };
 
-export const useWeb3Deposit = (wad: BigInt) => {};
+export const useWeb3Deposit = (wad: BigInt) => {
+  const web3 = useClient().web3;
+  const addr = web3.linkedAddress.getValue();
+  const queryClient = useQueryClient();
+
+  const mutationFn = useCallback(async () => {
+    const txn = await web3.deposit(wad);
+
+    // after txn resolves, invalidate the balances
+    txn.onResolve(() =>
+      queryClient.invalidateQueries({
+        queryKey: ["balance"],
+      }),
+    );
+
+    return txn;
+  }, [web3, addr, wad]);
+
+  return useMutation({
+    mutationFn,
+  });
+};
