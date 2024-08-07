@@ -4,7 +4,7 @@ import {
   CreateSpyreClientOptions,
   ISpyreClient,
 } from "../client/client";
-import {createContext, PropsWithChildren, useMemo} from "react";
+import {createContext, PropsWithChildren, useMemo, useRef} from "react";
 import {
   AutoConnect,
   ConnectEmbed,
@@ -16,6 +16,7 @@ import {
 import {createThirdwebClient, ThirdwebClient} from "thirdweb";
 import {useClient} from "./hooks/use-client";
 import {ThirdWebWeb3Service} from "../core/web3/service";
+import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 
 export const SpyreClientCtx = createContext<ISpyreClient | undefined>(
   undefined,
@@ -64,6 +65,7 @@ function ThirdwebContextWrapper(
     thirdwebClient: ThirdwebClient;
   }>,
 ) {
+  const queryClient = useRef(new QueryClient());
   const connectionManager = useConnectionManager();
   const client = useMemo(
     () =>
@@ -72,9 +74,11 @@ function ThirdwebContextWrapper(
   );
 
   return (
-    <SpyreClientCtx.Provider value={client}>
-      {props.children}
-    </SpyreClientCtx.Provider>
+    <QueryClientProvider client={queryClient.current}>
+      <SpyreClientCtx.Provider value={client}>
+        {props.children}
+      </SpyreClientCtx.Provider>
+    </QueryClientProvider>
   );
 }
 

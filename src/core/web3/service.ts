@@ -3,12 +3,21 @@ import {
   SigningErrorType,
   SigniningError,
   SignStakeParameters,
+  Txn,
   Web3Address,
   Web3Config,
   Web3ConnectionStatus,
 } from "./types";
 
-import {getRSV, getStakingDomain, getStakingTypes} from "./helpers";
+import {
+  getDepositDomain,
+  getDepositTypes,
+  getPermitDomain,
+  getPermitTypes,
+  getRSV,
+  getStakingDomain,
+  getStakingTypes,
+} from "./helpers";
 import {base, baseSepolia, Chain} from "thirdweb/chains";
 import {ConnectionManager} from "thirdweb/wallets";
 import {
@@ -20,8 +29,15 @@ import {
 import {asyncOps} from "../util/async";
 import {IAccountService} from "../account/service";
 import {ReadContractResult} from "thirdweb/dist/types/transaction/read-contract";
-import {WatchedValue, AsyncValue, SpyreError} from "../shared/types";
+import {
+  WatchedValue,
+  WatchedAsyncValue,
+  SpyreError,
+  CancelToken,
+} from "../shared/types";
 import {SpyreErrorCode} from "../shared/errors";
+import {IRpcService} from "core/net/service";
+import {DepositResponse, GetNonceResponse, PermitResponse} from "./types.gen";
 
 /*export const useHangmanDomain = () => {
   const params = useWeb3Contants();
@@ -35,17 +51,29 @@ import {SpyreErrorCode} from "../shared/errors";
 
 export interface IWeb3Service {
   get config(): Web3Config;
+
+  // setup
   get status(): WatchedValue<Web3ConnectionStatus>;
   get activeAddress(): WatchedValue<Web3Address | null>;
   get linkedAddress(): WatchedValue<Web3Address | null>;
   get needsToSwitchChains(): WatchedValue<boolean>;
 
-  get stakingBalance(): AsyncValue<BigInt>;
-  get usdcBalance(): AsyncValue<BigInt>;
-  get withdrawAfter(): AsyncValue<Date>;
+  // balance
+  get stakingBalance(): WatchedAsyncValue<BigInt>;
+  get usdcBalance(): WatchedAsyncValue<BigInt>;
+
+  // withdrawal
+  get withdrawAfter(): WatchedAsyncValue<Date>;
 
   switchChain(): Promise<void>;
-  signStake(params: SignStakeParameters): Promise<Signature>;
+  signStake(
+    params: SignStakeParameters,
+    cancel?: CancelToken,
+  ): Promise<Signature>;
+
+  requiresApproval(wad: BigInt, cancel?: CancelToken): Promise<boolean>;
+  approve(wad?: BigInt, cancel?: CancelToken): Promise<Txn>;
+  deposit(amount: BigInt, cancel?: CancelToken): Promise<Txn>;
 }
 
 export class ThirdWebWeb3Service implements IWeb3Service {
@@ -62,9 +90,9 @@ export class ThirdWebWeb3Service implements IWeb3Service {
   public readonly stakingContract: ThirdwebContract<any>;
   public readonly usdcContract: ThirdwebContract<any>;
 
-  public readonly stakingBalance: AsyncValue<BigInt>;
-  public readonly usdcBalance: AsyncValue<BigInt>;
-  public readonly withdrawAfter: AsyncValue<Date> = {
+  public readonly stakingBalance: WatchedAsyncValue<BigInt>;
+  public readonly usdcBalance: WatchedAsyncValue<BigInt>;
+  public readonly withdrawAfter: WatchedAsyncValue<Date> = {
     value: new WatchedValue(new Date()),
     fetch: new WatchedValue(asyncOps.new()),
     refresh: async () => {
@@ -75,6 +103,7 @@ export class ThirdWebWeb3Service implements IWeb3Service {
   constructor(
     public readonly config: Web3Config,
     private readonly _account: IAccountService,
+    private readonly _rpc: IRpcService,
     public readonly thirdweb: ThirdwebClient,
     private readonly _connectionManager: ConnectionManager,
   ) {
@@ -205,16 +234,209 @@ export class ThirdWebWeb3Service implements IWeb3Service {
     return this._linkedAddress;
   }
 
+  requiresApproval(wad: BigInt, cancel?: CancelToken): Promise<boolean> {
+    throw new Error("Method not implemented.");
+  }
+
+  async approve(wad?: BigInt, cancel?: CancelToken): Promise<Txn> {
+    const account = this._connectionManager.activeAccountStore.getValue();
+    if (!account) {
+      throw new SpyreError(
+        SpyreErrorCode.FAILED_PRECONDITION,
+        "Wallet is not connected.",
+      );
+    }
+
+    if (this.linkedAddress.getValue() !== this.activeAddress.getValue()) {
+      throw new SpyreError(
+        SpyreErrorCode.FAILED_PRECONDITION,
+        "Connected wallet address is not linked to account.",
+      );
+    }
+
+    cancel?.throwIfCancelled();
+
+    // get nonce first
+    let nonce: ReadContractResult<any>;
+    try {
+      nonce = await readContract({
+        contract: this.usdcContract,
+        method: "nonces",
+        params: [this._linkedAddress.getValue()],
+      });
+    } catch (error) {
+      throw new SpyreError(SpyreErrorCode.UNAVAILABLE, "Failed to get nonce.", [
+        error,
+      ]);
+    }
+
+    cancel?.throwIfCancelled();
+
+    const domain = getPermitDomain({
+      contractAddr: this.config.contracts.usdc.addr,
+      chainId: this.network.id,
+    });
+    const types = {Permit: getPermitTypes()};
+    const permit = {
+      owner: this._linkedAddress.getValue(),
+      spender: this.config.contracts.staking.addr,
+      value:
+        wad ||
+        BigInt(
+          "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+        ),
+      nonce,
+      deadline: BigInt(
+        "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      ),
+    };
+
+    let signResult;
+    try {
+      signResult = await account.signTypedData({
+        domain,
+        types,
+        primaryType: "Permit",
+        message: permit,
+      });
+    } catch (error) {
+      throw new SpyreError(
+        SpyreErrorCode.UNAVAILABLE,
+        "Failed to sign permit.",
+        [error],
+      );
+    }
+
+    cancel?.throwIfCancelled();
+
+    let permitResult;
+    try {
+      permitResult = await this._rpc.call<PermitResponse>("pipeline/permit", {
+        permit,
+        signedMsg: signResult,
+      });
+    } catch (error) {
+      throw new SpyreError(
+        SpyreErrorCode.UNAVAILABLE,
+        "Permit successfully signed, but there was an error submitting.",
+        [error],
+      );
+    }
+
+    cancel?.throwIfCancelled();
+
+    if (!permitResult.payload.success) {
+      throw new SpyreError(
+        SpyreErrorCode.UNAVAILABLE,
+        "Failed to submit permit.",
+        [permitResult.payload.error],
+      );
+    }
+
+    const txn = new Txn(permitResult.payload.txnId);
+
+    // todo: WATCH txn
+
+    return txn;
+  }
+
+  async deposit(wad: BigInt, cancel?: CancelToken): Promise<Txn> {
+    const account = this._connectionManager.activeAccountStore.getValue();
+    if (!account) {
+      throw new SpyreError(
+        SpyreErrorCode.FAILED_PRECONDITION,
+        "Wallet is not connected.",
+      );
+    }
+
+    if (this.linkedAddress.getValue() !== this.activeAddress.getValue()) {
+      throw new SpyreError(
+        SpyreErrorCode.FAILED_PRECONDITION,
+        "Connected wallet address is not linked to account.",
+      );
+    }
+
+    cancel?.throwIfCancelled();
+
+    // get nonce
+    const {
+      payload: {success, nonce},
+    } = await this._rpc.call<GetNonceResponse>("nonces/get-nonce", {});
+    if (!success) {
+      throw new SpyreError(SpyreErrorCode.UNAVAILABLE, "Failed to get nonce.");
+    }
+
+    const domain = getDepositDomain({
+      contractAddr: this.config.contracts.staking.addr,
+      chainId: this.network.id,
+    });
+    const types = {Deposit: getDepositTypes()};
+    const deposit = {
+      user: this.linkedAddress.getValue(),
+      nonce: BigInt(nonce),
+      expiry: BigInt(0),
+      amount: BigInt(wad + "000000"),
+      fee: BigInt(0),
+    };
+
+    let result;
+    try {
+      result = await account.signTypedData({
+        domain,
+        primaryType: "Deposit",
+        types,
+        message: deposit,
+      });
+    } catch (error) {
+      throw new SpyreError(
+        SpyreErrorCode.UNAVAILABLE,
+        "Failed to sign deposit.",
+      );
+    }
+
+    const signature = result;
+    const rsv = getRSV(signature);
+
+    let depositResult;
+    try {
+      depositResult = await this._rpc.call<DepositResponse>(
+        "pipeline/deposit",
+        {
+          deposit,
+          signedMsg: rsv,
+        },
+      );
+    } catch (error) {
+      throw new SpyreError(
+        SpyreErrorCode.UNAVAILABLE,
+        "Failed to submit deposit.",
+      );
+    }
+
+    cancel?.throwIfCancelled();
+
+    if (!depositResult.payload.success) {
+      throw new SpyreError(
+        SpyreErrorCode.UNAVAILABLE,
+        "Failed to submit deposit.",
+      );
+    }
+
+    const txn = new Txn(depositResult.payload.txnId);
+
+    // TODO: WATCH txn
+
+    return txn;
+  }
+
   async switchChain(): Promise<void> {
     await this._connectionManager.switchActiveWalletChain(this.network);
   }
 
-  async signStake({
-    nonce,
-    expiry,
-    amount,
-    fee,
-  }: SignStakeParameters): Promise<Signature> {
+  async signStake(
+    {nonce, expiry, amount, fee}: SignStakeParameters,
+    cancel?: CancelToken,
+  ): Promise<Signature> {
     const account = this._connectionManager.activeAccountStore.getValue();
     if (!account) {
       throw new SpyreError(

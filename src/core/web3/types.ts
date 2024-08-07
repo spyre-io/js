@@ -47,3 +47,59 @@ export class SigniningError extends Error {
     super(message);
   }
 }
+
+export enum TxnStatus {
+  NotStarted = "not-started",
+  Sent = "sent",
+  WaitingForConfirmation = "waiting-for-confirmation",
+  Confirmed = "success",
+  Failed = "failure",
+}
+
+export class Txn {
+  private _status: TxnStatus = TxnStatus.NotStarted;
+  private _hash: string = "";
+  private _error: string = "";
+
+  constructor(public readonly id: number) {
+    this._status = TxnStatus.Sent;
+  }
+
+  get status(): TxnStatus {
+    return this._status;
+  }
+
+  get hash(): string {
+    return this._hash;
+  }
+
+  get error(): string {
+    return this._error;
+  }
+
+  get isConfirmed(): boolean {
+    return this._status === TxnStatus.Confirmed;
+  }
+
+  sent(): void {
+    this._status = TxnStatus.Sent;
+  }
+
+  waiting(): void {
+    this._status = TxnStatus.WaitingForConfirmation;
+  }
+
+  confirm(hash: string): void {
+    this._status = TxnStatus.Confirmed;
+    this._hash = hash;
+  }
+
+  fail(error: string): void {
+    this._status = TxnStatus.Failed;
+    this._error = error;
+  }
+
+  onResolve(cb: () => void) {
+    // TODO
+  }
+}

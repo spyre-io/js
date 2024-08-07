@@ -5,12 +5,18 @@ export type Kv<T> = {[k: string]: T};
 export type CancelToken = {
   cancelled: boolean;
   cancel: () => void;
+  throwIfCancelled: () => void;
 };
 
 export const newCancelToken = () => {
   const token: CancelToken = {
     cancelled: false,
     cancel: () => (token.cancelled = true),
+    throwIfCancelled: () => {
+      if (token.cancelled) {
+        throw new Error("Cancelled");
+      }
+    },
   };
 
   return token;
@@ -24,6 +30,11 @@ export type AsyncOp = {
   isFailure: boolean;
   error: any;
   lastUpdated: number;
+};
+
+export type AsyncValue<T> = {
+  value: T;
+  fetch: AsyncOp;
 };
 
 export class SpyreError extends Error {
@@ -98,7 +109,7 @@ export class WatchedValue<T> {
   };
 }
 
-export type AsyncValue<T> = {
+export type WatchedAsyncValue<T> = {
   value: WatchedValue<T>;
   fetch: WatchedValue<AsyncOp>;
 

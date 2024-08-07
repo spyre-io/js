@@ -24,6 +24,7 @@ import {
 } from "../core/leaderboards/service";
 import {ThirdwebClient} from "thirdweb";
 import {ConnectionManager} from "thirdweb/wallets";
+import {QueryClient} from "@tanstack/react-query";
 
 export type CreateSpyreClientOptions = {
   web3: Web3Config;
@@ -93,6 +94,7 @@ export function createSpyreClient(
   const web3 = new ThirdWebWeb3Service(
     options.web3,
     account,
+    connection,
     thirdweb,
     connectionManager,
   );

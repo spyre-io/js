@@ -7,7 +7,7 @@ export {asyncOps, repeatAsync} from "./core/util/async";
 export {getBackoffMs, waitMs} from "./core/util/net";
 
 // core/web3
-export {fromWei} from "./core/web3/helpers";
+export {fromWei, toWei} from "./core/web3/helpers";
 
 // core/features/vault
 //export {getVaultValue, isVaultFull} from "./core/features/vaults/helpers";
@@ -27,6 +27,8 @@ export type {
   ContractConfig,
   Signature,
   SignStakeParameters,
+  TxnStatus,
+  Txn,
 } from "./core/web3/types";
 
 // react
@@ -65,12 +67,13 @@ export {
   useWeb3ActiveAddress,
   useWeb3LinkedAddress,
   useWeb3StakingBalance,
-  useWeb3StakingBalanceFetch,
   useWeb3UsdcBalance,
-  useWeb3UsdcBalanceFetch,
   useWeb3NeedsSwitchChain,
   useWeb3SwitchChain,
   useWeb3RefreshBalances,
+  useWeb3RequiresApproval,
+  useWeb3Approve,
+  useWeb3Deposit,
 } from "./react/hooks/use-web3";
 
 // redux?
