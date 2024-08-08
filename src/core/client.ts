@@ -1,11 +1,8 @@
 import {ILogTarget} from "./util/logger";
 import {AccountService, IAccountService} from "./account/service";
 import {IMultiplayerService, MultiplayerService} from "./multiplayer/service";
-import {
-  ConnectionService,
-  IConnectionService,
-  IRpcService,
-} from "./net/service";
+import {ConnectionService} from "./net/service";
+import {IConnectionService, IRpcService} from "./net/interfaces";
 import {
   INotificationService,
   NotificationService,
@@ -17,6 +14,7 @@ import {v4, validate} from "uuid";
 import {ILeaderboardService, LeaderboardService} from "./leaderboards/service";
 import {ThirdwebClient} from "thirdweb";
 import {ConnectionManager} from "thirdweb/wallets";
+import {Dispatcher} from "./shared/dispatcher";
 
 /**
  * Options for creating a new {@link ISpyreClient} instance.
@@ -145,6 +143,7 @@ export function createSpyreClient(
   thirdweb: ThirdwebClient,
   connectionManager: ConnectionManager,
 ): ISpyreClient {
+  const events = new Dispatcher<any>();
   const notifications = new NotificationService();
   const leaderboards = new LeaderboardService();
   const connection = new ConnectionService(notifications);
@@ -152,14 +151,15 @@ export function createSpyreClient(
   // todo: fix circular dependency
   notifications.init(connection);
 
-  const account = new AccountService(connection);
+  const account = new AccountService(connection, events);
 
   const web3 = new ThirdWebWeb3Service(
-    options.web3,
+    events,
     account,
     connection,
-    thirdweb,
     connectionManager,
+    options.web3,
+    thirdweb,
   );
   const multiplayer = new MultiplayerService(
     connection,

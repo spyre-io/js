@@ -131,6 +131,16 @@ export const useWeb3NeedsSwitchChain = (): boolean => {
   );
 };
 
+export const useWeb3Link = () => {
+  const web3 = useClient().web3;
+
+  const fn = useCallback(async () => await web3.link(), [web3]);
+
+  return useMutation({
+    mutationFn: fn,
+  });
+};
+
 export const useWeb3SwitchChain = (): (() => Promise<void>) => {
   const web3 = useClient().web3;
 

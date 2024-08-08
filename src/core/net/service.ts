@@ -5,38 +5,14 @@ import {v4} from "uuid";
 import {ApiRpc} from "@heroiclabs/nakama-js/dist/api.gen";
 import {CancelToken, Kv, newCancelToken} from "@/core/shared/types";
 import {INotificationService} from "@/core/notifications/service";
-import {RpcResponse} from "./types";
+import {
+  IConnectionService,
+  INakamaClientService,
+  IRpcService,
+} from "./interfaces";
+import {AsyncClientFn} from "./types";
 
 const log = childLogger("connection");
-
-type AsyncClientFn<T> = (client: Client, session: Session) => Promise<T>;
-
-export interface INakamaClientService {
-  getApi<T>(fn: AsyncClientFn<T>, retries: number): Promise<T>;
-}
-
-export interface IConnectionService {
-  get isConnected(): boolean;
-
-  init(deviceId: string): void;
-  connect(): Promise<void>;
-  disconnect(): void;
-
-  join(matchId: string, meta: Kv<string>, retries: number): Promise<Match>;
-  leave(): Promise<void>;
-  sendMatchState(
-    matchId: string,
-    opCode: number,
-    payload: string | Uint8Array,
-    retries?: number,
-  ): Promise<void>;
-}
-
-export interface IRpcService {
-  call<T>(id: string, input: any): Promise<RpcResponse<T>>;
-}
-
-type ParsedApiRpc = ApiRpc & {payload: any};
 
 export class ConnectionService
   implements IConnectionService, IRpcService, INakamaClientService
@@ -64,7 +40,7 @@ export class ConnectionService
   _matchMeta: object | null = null;
 
   // used in rpcWithRetry to dedupe requests
-  _requestCache: {[key: string]: Promise<ParsedApiRpc>} = {};
+  _requestCache: {[key: string]: Promise<any>} = {};
 
   get isConnected() {
     return !!this._socket;
@@ -137,7 +113,7 @@ export class ConnectionService
 
   // The RPC interface. This both deduplicates requests and auto-reconnects if
   // there is a connection failure.
-  call<T>(id: string, input: any): Promise<RpcResponse<T>> {
+  call<T>(id: string, input: any): Promise<T> {
     const payload = JSON.stringify(input);
     const key = id + payload;
 
@@ -180,7 +156,7 @@ export class ConnectionService
         });
     }
 
-    return req;
+    return req as Promise<T>;
   }
 
   // Joins a match with the given match ID and metadata. This should be used

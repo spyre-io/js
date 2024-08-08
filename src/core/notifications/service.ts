@@ -1,4 +1,4 @@
-import {INakamaClientService} from "@/core/net/service";
+import {INakamaClientService} from "@/core/net/interfaces";
 import {Dispatcher, IDispatcher} from "@/core/shared/dispatcher";
 import {Notification} from "./types";
 

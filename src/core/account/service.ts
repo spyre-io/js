@@ -1,11 +1,12 @@
 import {ApiAccount} from "@heroiclabs/nakama-js/dist/api.gen";
-import {INakamaClientService} from "@/core/net/service";
+import {INakamaClientService} from "@/core/net/interfaces";
 import {AsyncOp, Kv} from "@/core/shared/types";
 import {logger} from "@/core/util/logger";
 import {Web3Address} from "@/core/web3/types";
 import {User} from "./types";
 import {asyncOps} from "@/core/util/async";
 import {Dispatcher} from "@/core/shared/dispatcher";
+import {Messages} from "@/core/shared/message";
 
 export const NullUser: User = {
   walletAddr: null,
@@ -51,8 +52,9 @@ export interface IAccountService {
    * ```
    *
    * @param fn - The callback function
+   * @returns A function that unregisters the callback.
    */
-  onUpdate(fn: (user: User) => void): void;
+  onUpdate(fn: (user: User) => void): () => void;
 }
 
 const getUser = (account: ApiAccount): User => {
@@ -132,8 +134,15 @@ export class AccountService implements IAccountService {
 
   private readonly _dispatcher = new Dispatcher<User>();
 
-  constructor(private readonly _nakama: INakamaClientService) {
-    //
+  constructor(
+    private readonly _nakama: INakamaClientService,
+    private readonly _events: Dispatcher<any>,
+  ) {
+    // listen for updates
+    _events.addHandler(
+      Messages.ACCOUNT_WALLET_CONNECTED,
+      (msg) => (this._user.walletAddr = msg.addr),
+    );
   }
 
   get status(): AsyncOp {
@@ -173,7 +182,7 @@ export class AccountService implements IAccountService {
     throw new Error("Not implemented");
   };
 
-  onUpdate = (fn: (user: User) => void): void => {
-    this._dispatcher.addHandler(0, fn);
+  onUpdate = (fn: (user: User) => void): (() => void) => {
+    return this._dispatcher.addHandler(0, fn);
   };
 }

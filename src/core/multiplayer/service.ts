@@ -3,7 +3,7 @@ import {MatchInfo, MatchmakingInfo} from "@/core/shared/types.gen";
 import {logger} from "@/core/util/logger";
 import {Kv} from "@/core/shared/types";
 import {Match} from "@heroiclabs/nakama-js";
-import {IConnectionService, IRpcService} from "@/core/net/service";
+import {IConnectionService, IRpcService} from "@/core/net/interfaces";
 import {IAccountService} from "@/core/account/service";
 import {IWeb3Service} from "@/core/web3/service";
 import {MatchmakingAcceptSignals, MatchmakingBracketInfo} from "./types";
@@ -93,11 +93,11 @@ export class MultiplayerService implements IMultiplayerService {
       "hangman/matchmaking/find",
       {bracketId},
     );
-    if (!res.payload.success) {
+    if (!res.success) {
       throw new Error("Failed to find matches");
     }
 
-    const {matchmakingInfo, matchInfo} = res.payload;
+    const {matchmakingInfo, matchInfo} = res;
 
     // we might already be in a match
     const {creatorMatchId, opponentMatchIds} = matchInfo;
@@ -155,7 +155,7 @@ export class MultiplayerService implements IMultiplayerService {
       },
     );
 
-    if (!res.payload.success) {
+    if (!res.success) {
       throw new Error("Failed to accept match");
     }
 
@@ -163,7 +163,7 @@ export class MultiplayerService implements IMultiplayerService {
       onAcceptComplete();
     }
 
-    this.matchJoinIds = res.payload.matchJoinIds;
+    this.matchJoinIds = res.matchJoinIds;
 
     // iterate through match join ids and try to join one
     if (onJoinStart) {

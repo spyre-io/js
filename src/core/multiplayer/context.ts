@@ -1,5 +1,6 @@
 import {Match} from "@heroiclabs/nakama-js";
-import {IConnectionService} from "@/core/net/service";
+import {IConnectionService} from "@/core/net/interfaces";
+import {logger} from "../util/logger";
 
 export interface IMatchContext {
   get matchId(): string;
@@ -23,6 +24,8 @@ export class MatchContext implements IMatchContext {
   }
 
   addHandler<T>(opCode: number, handler: (payload: T) => void): () => void {
+    logger.debug(`MatchContext.addHandler(@opCode, @handler)`, opCode, handler);
+
     return () => {};
   }
 
@@ -31,7 +34,9 @@ export class MatchContext implements IMatchContext {
 
     try {
       await this.connection.sendMatchState(this.match.match_id, opCode, json);
-    } catch (error) {}
+    } catch (error) {
+      //
+    }
   }
 
   quit(): void {
@@ -45,14 +50,19 @@ export class NullMatchContext implements IMatchContext {
   }
 
   addHandler<T>(opCode: number, handler: (payload: T) => void): () => void {
+    logger.debug(
+      `NullMatchContext.addHandler(@opCode, @handler)`,
+      opCode,
+      handler,
+    );
     return () => {};
   }
 
   send(opCode: number, payload: any): void {
-    //
+    logger.debug(`NullMatchContext.send(@opCode, @payload)`, opCode, payload);
   }
 
   quit(): void {
-    //
+    logger.debug(`NullMatchContext.quit()`);
   }
 }

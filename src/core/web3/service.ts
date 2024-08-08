@@ -22,6 +22,7 @@ import {base, baseSepolia, Chain} from "thirdweb/chains";
 import {ConnectionManager} from "thirdweb/wallets";
 import {
   getContract,
+  Hex,
   readContract,
   ThirdwebClient,
   ThirdwebContract,
@@ -36,9 +37,17 @@ import {
   CancelToken,
 } from "@/core/shared/types";
 import {SpyreErrorCode} from "@/core/shared/errors";
-import {IRpcService} from "@/core/net/service";
-import {DepositResponse, GetNonceResponse, PermitResponse} from "./types.gen";
+import {IRpcService} from "@/core/net/interfaces";
+import {
+  AuthWalletVerifyResponse,
+  DepositResponse,
+  GetLinkChallengeResponse,
+  GetNonceResponse,
+  PermitResponse,
+} from "./types.gen";
 import {logger} from "@/core/util/logger";
+import {Dispatcher} from "@/core/shared/dispatcher";
+import {Messages} from "@/core/shared/message";
 
 /*export const useHangmanDomain = () => {
   const params = useWeb3Contants();
@@ -98,6 +107,11 @@ export interface IWeb3Service {
    * Switches the user's wallet to the correct chain given by the configuration.
    */
   switchChain(): Promise<void>;
+
+  /**
+   * Links the connected wallet to the current user account.
+   */
+  link(cancel?: CancelToken): Promise<void>;
 
   /**
    * Signs a stake, which can then be used to enter matches.
@@ -160,11 +174,12 @@ export class ThirdWebWeb3Service implements IWeb3Service {
   };
 
   constructor(
-    public readonly config: Web3Config,
+    private readonly _events: Dispatcher<any>,
     private readonly _account: IAccountService,
     private readonly _rpc: IRpcService,
-    public readonly thirdweb: ThirdwebClient,
     private readonly _connectionManager: ConnectionManager,
+    public readonly config: Web3Config,
+    public readonly thirdweb: ThirdwebClient,
   ) {
     if (!config.contracts["staking"]) {
       throw new Error("Missing staking contract");
@@ -293,10 +308,108 @@ export class ThirdWebWeb3Service implements IWeb3Service {
     return this._linkedAddress;
   }
 
-  requiresApproval(wad: bigint, cancel?: CancelToken): Promise<boolean> {
+  link = async (cancelToken?: CancelToken): Promise<void> => {
+    cancelToken?.throwIfCancelled();
+
+    const account = this._connectionManager.activeAccountStore.getValue();
+    if (!account) {
+      throw new SpyreError(
+        SpyreErrorCode.FAILED_PRECONDITION,
+        "Wallet is not connected.",
+      );
+    }
+
+    // this might already be done
+    if (this.linkedAddress.getValue() === this.activeAddress.getValue()) {
+      return;
+    }
+
+    // first, get a challenge
+    // todo: remove hangman, obvi
+    let res: GetLinkChallengeResponse;
+    try {
+      res = await this._rpc.call<GetLinkChallengeResponse>(
+        "hangman/auth/wallet-init",
+        {},
+      );
+    } catch (error) {
+      throw new SpyreError(
+        SpyreErrorCode.UNAVAILABLE,
+        "Failed to get challenge.",
+        [error],
+      );
+    }
+
+    console.log(res);
+
+    if (!res.success) {
+      throw new SpyreError(
+        SpyreErrorCode.UNAVAILABLE,
+        "Failed to get challenge.",
+        [res.error],
+      );
+    }
+
+    cancelToken?.throwIfCancelled();
+
+    // sign the challenge
+    let signRes: Hex;
+    try {
+      signRes = await account.signMessage({
+        message: res.payload,
+      });
+    } catch (error) {
+      throw new SpyreError(
+        SpyreErrorCode.UNAVAILABLE,
+        "Failed to sign challenge.",
+        [error],
+      );
+    }
+
+    cancelToken?.throwIfCancelled();
+
+    // fire off to server
+    let submitRes: AuthWalletVerifyResponse;
+    try {
+      submitRes = await this._rpc.call<AuthWalletVerifyResponse>(
+        "hangman/auth/wallet-verify",
+        {
+          initRequestId: res.initRequestId,
+          signedPayload: signRes,
+        },
+      );
+    } catch (error) {
+      throw new SpyreError(
+        SpyreErrorCode.UNAVAILABLE,
+        "Failed to submit challenge.",
+        [error],
+      );
+    }
+
+    if (!submitRes.success) {
+      throw new SpyreError(
+        SpyreErrorCode.UNAVAILABLE,
+        "Failed to submit challenge.",
+        [submitRes.error],
+      );
+    }
+
+    cancelToken?.throwIfCancelled();
+
+    // update local account custom_id
+    this._linkedAddress.setValue(submitRes.addr);
+    this._events.on(Messages.ACCOUNT_WALLET_CONNECTED, {
+      addr: submitRes.addr,
+    });
+  };
+
+  requiresApproval = async (
+    wad: bigint,
+    cancel?: CancelToken,
+  ): Promise<boolean> => {
     logger.debug("requiresApproval(@wad, @cancel)", wad, cancel);
     throw new Error("Method not implemented.");
-  }
+  };
 
   approve = async (wad?: bigint, cancel?: CancelToken): Promise<Txn> => {
     const account = this._connectionManager.activeAccountStore.getValue();
@@ -385,15 +498,15 @@ export class ThirdWebWeb3Service implements IWeb3Service {
 
     cancel?.throwIfCancelled();
 
-    if (!permitResult.payload.success) {
+    if (!permitResult.success) {
       throw new SpyreError(
         SpyreErrorCode.UNAVAILABLE,
         "Failed to submit permit.",
-        [permitResult.payload.error],
+        [permitResult.error],
       );
     }
 
-    const txn = new Txn(permitResult.payload.txnId);
+    const txn = new Txn(permitResult.txnId);
 
     // todo: WATCH txn
 
@@ -419,9 +532,10 @@ export class ThirdWebWeb3Service implements IWeb3Service {
     cancel?.throwIfCancelled();
 
     // get nonce
-    const {
-      payload: {success, nonce},
-    } = await this._rpc.call<GetNonceResponse>("nonces/get-nonce", {});
+    const {success, nonce} = await this._rpc.call<GetNonceResponse>(
+      "nonces/get-nonce",
+      {},
+    );
     if (!success) {
       throw new SpyreError(SpyreErrorCode.UNAVAILABLE, "Failed to get nonce.");
     }
@@ -475,14 +589,14 @@ export class ThirdWebWeb3Service implements IWeb3Service {
 
     cancel?.throwIfCancelled();
 
-    if (!depositResult.payload.success) {
+    if (!depositResult.success) {
       throw new SpyreError(
         SpyreErrorCode.UNAVAILABLE,
         "Failed to submit deposit.",
       );
     }
 
-    const txn = new Txn(depositResult.payload.txnId);
+    const txn = new Txn(depositResult.txnId);
 
     // TODO: WATCH txn
 

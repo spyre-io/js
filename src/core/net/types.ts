@@ -1,5 +1,3 @@
-export type RpcResponse<T> = {
-  payload: T;
+import {Client, Session} from "@heroiclabs/nakama-js";
 
-  // todo: other network info
-};
+export type AsyncClientFn<T> = (client: Client, session: Session) => Promise<T>;

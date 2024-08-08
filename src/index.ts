@@ -27,8 +27,7 @@ export {
 } from "@/core/multiplayer/types";
 
 // core/net
-export type {IRpcService, IConnectionService} from "@/core/net/service";
-export type {RpcResponse} from "@/core/net/types";
+export type {IRpcService, IConnectionService} from "@/core/net/interfaces";
 
 // core/notifications
 export type {INotificationService} from "@/core/notifications/service";
@@ -118,6 +117,7 @@ export {
   useWeb3RequiresApproval,
   useWeb3Approve,
   useWeb3Deposit,
+  useWeb3Link,
 } from "@/react/hooks/use-web3";
 
 // redux?
