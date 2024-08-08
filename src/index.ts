@@ -4,6 +4,11 @@
 export type {User} from "@/core/account/types";
 export type {IAccountService} from "@/core/account/service";
 
+// core/history
+export type {IHistoryService} from "@/core/history/service";
+export type {HistorySearchCriteria} from "@/core/history/types";
+export type {HistoryItem, HistorySummaryItem} from "@/core/history/types.gen";
+
 // core/leaderboards
 export type {ILeaderboardService} from "@/core/leaderboards/service";
 export type {LeaderboardEntry} from "@/core/leaderboards/types";
@@ -100,6 +105,9 @@ export {
   useAccountRefresh,
   useAccountUpdate,
 } from "@/react/hooks/use-account";
+
+// react/hooks/history
+export {useHistoryFind, useHistoryGet} from "@/react/hooks/use-history";
 
 // react/hooks/web3
 export {

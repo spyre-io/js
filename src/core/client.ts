@@ -1,20 +1,27 @@
-import {ILogTarget} from "./util/logger";
-import {AccountService, IAccountService} from "./account/service";
-import {IMultiplayerService, MultiplayerService} from "./multiplayer/service";
-import {ConnectionService} from "./net/service";
-import {IConnectionService, IRpcService} from "./net/interfaces";
+import {ILogTarget} from "@/core/util/logger";
+import {AccountService, IAccountService} from "@/core/account/service";
+import {
+  IMultiplayerService,
+  MultiplayerService,
+} from "@/core/multiplayer/service";
+import {ConnectionService} from "@/core/net/service";
+import {IConnectionService, IRpcService} from "@/core/net/interfaces";
 import {
   INotificationService,
   NotificationService,
-} from "./notifications/service";
-import {IWeb3Service, ThirdWebWeb3Service} from "./web3/service";
-import {Web3Config} from "./web3/types";
+} from "@/core/notifications/service";
+import {IWeb3Service, ThirdWebWeb3Service} from "@/core/web3/service";
+import {Web3Config} from "@/core/web3/types";
 
 import {v4, validate} from "uuid";
-import {ILeaderboardService, LeaderboardService} from "./leaderboards/service";
+import {
+  ILeaderboardService,
+  LeaderboardService,
+} from "@/core/leaderboards/service";
 import {ThirdwebClient} from "thirdweb";
 import {ConnectionManager} from "thirdweb/wallets";
-import {Dispatcher} from "./shared/dispatcher";
+import {Dispatcher} from "@/core/shared/dispatcher";
+import {HistoryService, IHistoryService} from "@/core/history/service";
 
 /**
  * Options for creating a new {@link ISpyreClient} instance.
@@ -64,19 +71,14 @@ export interface ISpyreClient {
   account: IAccountService;
 
   /**
-   * Retrieves the {@link INotificationService} instance. This listens to push events from Spyre servers.
+   * Retrieves the {@link IHistoryService} instance. This provides an API for retrieving match history.
    */
-  notifications: INotificationService;
+  history: IHistoryService;
 
   /**
-   * Retrieves the {@link IConnectionService} instance. This manages the socket connection to the Spyre servers. It automatically handles reconnections and disconnects.
+   * Retrieves the {@link ILeaderboardService} instance. This provides access to the leaderboard service, which allows you to retrieve and update leaderboard information.
    */
-  connection: IConnectionService;
-
-  /**
-   * Retrieves the {@link IWeb3Service} instance. This provides an easy interface over Spyre's Game Wallet API, which connects off-chain account services with on-chain actions.
-   */
-  web3: IWeb3Service;
+  leaderboards: ILeaderboardService;
 
   /**
    * Retrieves the {@link IMultiplayerService} instance. This provides access to multiplayer services, such as matchmaking and in-match communcation.
@@ -84,14 +86,24 @@ export interface ISpyreClient {
   multiplayer: IMultiplayerService;
 
   /**
+   * Retrieves the {@link IConnectionService} instance. This manages the socket connection to the Spyre servers. It automatically handles reconnections and disconnects.
+   */
+  connection: IConnectionService;
+
+  /**
+   * Retrieves the {@link INotificationService} instance. This listens to push events from Spyre servers.
+   */
+  notifications: INotificationService;
+
+  /**
+   * Retrieves the {@link IWeb3Service} instance. This provides an easy interface over Spyre's Game Wallet API, which connects off-chain account services with on-chain actions.
+   */
+  web3: IWeb3Service;
+
+  /**
    * Retrieves the {@link IRpcService} instance. This provides access to the RPC service, which allows you to call functions on the server.
    */
   rpc: IRpcService;
-
-  /**
-   * Retrieves the {@link ILeaderboardService} instance. This provides access to the leaderboard service, which allows you to retrieve and update leaderboard information.
-   */
-  leaderboards: ILeaderboardService;
 
   /**
    * Initializes the client. This should be called before using any other services.
@@ -110,6 +122,7 @@ class SpyreClient implements ISpyreClient {
     public readonly multiplayer: IMultiplayerService,
     public readonly rpc: IRpcService,
     public readonly leaderboards: ILeaderboardService,
+    public readonly history: IHistoryService,
   ) {
     //
   }
@@ -152,6 +165,7 @@ export function createSpyreClient(
   notifications.init(connection);
 
   const account = new AccountService(connection, events);
+  const history = new HistoryService(connection);
 
   const web3 = new ThirdWebWeb3Service(
     events,
@@ -176,5 +190,6 @@ export function createSpyreClient(
     multiplayer,
     connection,
     leaderboards,
+    history,
   );
 }

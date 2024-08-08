@@ -3,7 +3,7 @@ import {getBackoffMs, waitMs} from "@/core/util/net";
 import {childLogger, logger} from "@/core/util/logger";
 import {v4} from "uuid";
 import {ApiRpc} from "@heroiclabs/nakama-js/dist/api.gen";
-import {CancelToken, Kv, newCancelToken} from "@/core/shared/types";
+import {CancelToken, Kv, newCancelToken, SpyreError} from "@/core/shared/types";
 import {INotificationService} from "@/core/notifications/service";
 import {
   IConnectionService,
@@ -11,6 +11,7 @@ import {
   IRpcService,
 } from "./interfaces";
 import {AsyncClientFn} from "./types";
+import {SpyreErrorCode} from "../shared/errors";
 
 const log = childLogger("connection");
 
@@ -137,7 +138,7 @@ export class ConnectionService
 
           const payload = JSON.parse(res.payload || "{}");
           if (payload.error) {
-            throw new Error(payload.error);
+            throw new SpyreError(SpyreErrorCode.INTERNAL, payload.error);
           }
 
           return {
