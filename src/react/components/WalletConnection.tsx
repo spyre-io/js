@@ -8,13 +8,34 @@ import {
 } from "@/react/hooks/use-web3";
 import {ConnectButton, Theme} from "thirdweb/react";
 
+/**
+ * Props for the `WalletConnection` component.
+ */
 export type WalletConnectionProps = {
+  /**
+   * The theme to use for the Thirdweb `ConnectButton`.
+   */
   theme?: Theme;
+
+  /**
+   * A custom component to render when the wallet is connected. If left undefined, it uses Thirdweb's `ConnectButton`.
+   */
   connected?: () => JSX.Element;
+
+  /**
+   * A custom component to render when the wallet is connecting.
+   */
   connecting?: () => JSX.Element;
+
+  /**
+   * A custom component to render when the wallet is disconnected.
+   */
   disconnected?: () => JSX.Element;
 };
 
+/**
+ * This React component wraps the Thirdweb `ConnectButton` and provides a simple way to render different components based on the wallet connection status.
+ */
 export function WalletConnection({
   theme,
   connected,

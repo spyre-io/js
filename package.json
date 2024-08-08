@@ -22,7 +22,7 @@
   "scripts": {
     "dev": "nodemon -x pnpm build",
     "build": "tsc && node ./scripts/fix-tsc.js",
-    "doc": "typedoc --out docs --plugin typedoc-github-theme --theme typedoc-github-theme src",
+    "doc": "typedoc --out docs src",
     "prepare": "husky",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\""

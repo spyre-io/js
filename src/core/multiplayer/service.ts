@@ -1,4 +1,3 @@
-import {Signature} from "@/core/web3/types";
 import {MatchmakingAcceptResponse, MatchmakingResponse} from "./types.gen";
 import {MatchInfo, MatchmakingInfo} from "@/core/shared/types.gen";
 import {logger} from "@/core/util/logger";
@@ -7,20 +6,9 @@ import {Match} from "@heroiclabs/nakama-js";
 import {IConnectionService, IRpcService} from "@/core/net/service";
 import {IAccountService} from "@/core/account/service";
 import {IWeb3Service} from "@/core/web3/service";
-import {MatchmakingBracketInfo} from "./types";
+import {MatchmakingAcceptSignals, MatchmakingBracketInfo} from "./types";
 import {IMatchHandler, IMatchHandlerFactory, NullMatchHandler} from "./handler";
 import {IMatchContext, MatchContext, NullMatchContext} from "./context";
-
-export type MatchmakingAcceptSignals = {
-  onSignStart?: () => void;
-  onSignComplete?: (signature: Signature) => void;
-
-  onAcceptStart?: () => void;
-  onAcceptComplete?: () => void;
-
-  onJoinStart?: () => void;
-  onJoinComplete?: () => void;
-};
 
 export interface IMultiplayerService {
   findMatches(bracketId: number): Promise<void>;

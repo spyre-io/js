@@ -18,6 +18,7 @@ import {
 import {useClient} from "@/react/hooks/use-client";
 import {ThirdWebWeb3Service} from "@/core/web3/service";
 
+// not exported in index.ts
 export const SpyreClientCtx = createContext<ISpyreClient | undefined>(
   undefined,
 );
@@ -33,6 +34,23 @@ export const wallets = [
   }),
 ];
 
+/**
+ * The `SpyreClientProvider` is a React component that provides the Spyre client, context, and hooks to the rest of the application.
+ *
+ * Wrap your application in this provider to access the Spyre client and its services.
+ *
+ * ```ts
+ * import { SpyreClientProvider } from "@spyre-io/becky";
+ *
+ * function Example() {
+ *  return (
+ *    <SpyreClientProvider config={config}>
+ *      <App />
+ *   </SpyreClientProvider>
+ *   );
+ * }
+ * ```
+ */
 export function SpyreClientProvider(
   props: PropsWithChildren<{
     config: CreateSpyreClientOptions;
@@ -97,6 +115,9 @@ export const defaultTheme = darkTheme({
   },
 });
 
+/**
+ * The `SpyreConnect` component is a React component that renders the Thirdweb wallet connection modal using the configuration already passed in to the `SpyreClientProvider`.
+ */
 export function SpyreConnect({theme}: {theme?: Theme}) {
   const client = useClient();
   const thirdwebService = client.web3 as ThirdWebWeb3Service;

@@ -1,10 +1,11 @@
-import {Client, ISession, Match, Session, Socket} from "@heroiclabs/nakama-js";
-import {getBackoffMs, waitMs} from "../util/net";
-import {childLogger} from "../util/logger";
+import {Client, Match, Session, Socket} from "@heroiclabs/nakama-js";
+import {getBackoffMs, waitMs} from "@/core/util/net";
+import {childLogger, logger} from "@/core/util/logger";
 import {v4} from "uuid";
 import {ApiRpc} from "@heroiclabs/nakama-js/dist/api.gen";
-import {CancelToken, Kv, newCancelToken} from "../shared/types";
-import {INotificationService} from "../notifications/service";
+import {CancelToken, Kv, newCancelToken} from "@/core/shared/types";
+import {INotificationService} from "@/core/notifications/service";
+import {RpcResponse} from "./types";
 
 const log = childLogger("connection");
 
@@ -30,12 +31,6 @@ export interface IConnectionService {
     retries?: number,
   ): Promise<void>;
 }
-
-export type RpcResponse<T> = {
-  payload: T;
-
-  // todo: other network info
-};
 
 export interface IRpcService {
   call<T>(id: string, input: any): Promise<RpcResponse<T>>;
@@ -362,7 +357,9 @@ export class ConnectionService
     // set high -- though this doesn't appear to do anything
     socket.setHeartbeatTimeoutMs(30000);
 
-    socket.onmatchdata = (message) => {};
+    socket.onmatchdata = (message) => {
+      logger.debug("Match data: @Message", message);
+    };
     socket.onnotification = (message) => {
       this.notifs.on(message.code!, {
         code: message.code!,

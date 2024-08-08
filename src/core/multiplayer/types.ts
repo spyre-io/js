@@ -1,3 +1,16 @@
+import {Signature} from "@/core/web3/types";
+
+export type MatchmakingAcceptSignals = {
+  onSignStart?: () => void;
+  onSignComplete?: (signature: Signature) => void;
+
+  onAcceptStart?: () => void;
+  onAcceptComplete?: () => void;
+
+  onJoinStart?: () => void;
+  onJoinComplete?: () => void;
+};
+
 export type MatchmakingBracketInfo = {
   nonce: string;
   expiry: number;

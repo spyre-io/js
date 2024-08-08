@@ -1,24 +1,60 @@
 ////////////////////////////////////////////////////////////////////////// core
 
+// core/account
+export type {User} from "@/core/account/types";
+export type {IAccountService} from "@/core/account/service";
+
+// core/leaderboards
+export type {ILeaderboardService} from "@/core/leaderboards/service";
+export type {LeaderboardEntry} from "@/core/leaderboards/types";
+
+// core/multiplayer
+export type {IMultiplayerService} from "@/core/multiplayer/service";
+export type {
+  IMatchHandler,
+  IMatchHandlerFactory,
+} from "@/core/multiplayer/handler";
+export type {IMatchContext} from "@/core/multiplayer/context";
+export type {
+  MatchmakingAcceptSignals,
+  MatchmakingBracketInfo,
+} from "@/core/multiplayer/types";
+export {
+  MatchUserState,
+  MatchStartEvent,
+  MatchEndEvent,
+  DisconnectReason,
+} from "@/core/multiplayer/types";
+
+// core/net
+export type {IRpcService, IConnectionService} from "@/core/net/service";
+export type {RpcResponse} from "@/core/net/types";
+
+// core/notifications
+export type {INotificationService} from "@/core/notifications/service";
+export type {Notification} from "@/core/notifications/types";
+
+// core/shared
+export type {
+  AsyncOp,
+  SpyreError,
+  Kv,
+  AsyncValue,
+  CancelToken,
+  WatchedAsyncValue,
+  WatchedValue,
+} from "@/core/shared/types";
+
 // core/util
 export {logger, childLogger, getHistory} from "@/core/util/logger";
+export type {ILogTarget} from "@/core/util/logger";
 export {runFor, waitFor} from "@/core/util/time";
 export {asyncOps, repeatAsync} from "@/core/util/async";
 export {getBackoffMs, waitMs} from "@/core/util/net";
 
 // core/web3
 export {fromWei, toWei} from "@/core/web3/helpers";
-
-// core/features/vault
-//export {getVaultValue, isVaultFull} from "./core/features/vaults/helpers";
-
-// core/account
-export type {User} from "@/core/account/types";
-
-// core/shared
-export type {AsyncOp} from "@/core/shared/types";
-
-// core/web3
+export type {IWeb3Service} from "@/core/web3/service";
 export type {
   Web3Address,
   Web3ConnectionStatus,
@@ -32,7 +68,11 @@ export type {
 
 // client
 export {createSpyreClient} from "@/core/client";
-export type {ISpyreClient, CreateSpyreClientOptions} from "@/core/client";
+export type {
+  ISpyreClient,
+  CreateSpyreClientOptions,
+  LogConfig,
+} from "@/core/client";
 
 ///////////////////////////////////////////////////////////////////////// react
 export {SpyreClientProvider, SpyreConnect} from "@/react/client-provider";

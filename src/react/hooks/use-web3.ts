@@ -23,6 +23,15 @@ export const useWeb3ThirdwebNetwork = () => {
 
 // exported
 
+/**
+ * Retrieves the current {@link Web3Config} object from the {@link IWeb3Service}.
+ *
+ * ```ts
+ * const config = useWeb3Config();
+ *
+ * console.log("Current chain:", config.network.id);
+ * ```
+ */
 export const useWeb3Config = () => {
   const web3 = useClient().web3;
 
