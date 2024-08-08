@@ -1,5 +1,5 @@
 import {Match} from "@heroiclabs/nakama-js";
-import {IConnectionService} from "core/net/service";
+import {IConnectionService} from "@/core/net/service";
 
 export interface IMatchContext {
   get matchId(): string;

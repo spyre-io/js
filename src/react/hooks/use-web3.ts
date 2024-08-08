@@ -2,9 +2,9 @@ import {useActiveWalletConnectionStatus} from "thirdweb/react";
 import {useAccount} from "./use-account";
 import {useClient} from "./use-client";
 import {useCallback, useSyncExternalStore} from "react";
-import {Web3Address} from "../../core/web3/types";
+import {Web3Address} from "@/core/web3/types";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
-import {ThirdWebWeb3Service} from "core/web3/service";
+import {ThirdWebWeb3Service} from "@/core/web3/service";
 
 // not exported in index
 export const useWeb3Thirdweb = () => {
@@ -43,6 +43,7 @@ export const useWeb3IsWalletConnectedAndLinked = () => {
   return (
     status === "connected" &&
     connectedAddress &&
+    account &&
     connectedAddress === account.walletAddr
   );
 };

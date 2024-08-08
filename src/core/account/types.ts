@@ -1,5 +1,5 @@
-import {Kv} from "core/shared/types";
-import {Web3Address} from "../web3/types";
+import {Kv} from "@/core/shared/types";
+import {Web3Address} from "@/core/web3/types";
 
 export type User = {
   avatarUrl?: string;

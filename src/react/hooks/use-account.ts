@@ -1,6 +1,6 @@
 import {useCallback} from "react";
 import {useClient} from "./use-client";
-import {User} from "../../core/account/types";
+import {User} from "@/core/account/types";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 
 export const useAccount = () => {

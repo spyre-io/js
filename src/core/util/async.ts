@@ -1,4 +1,4 @@
-import {AsyncOp} from "../shared/types";
+import {AsyncOp} from "@/core/shared/types";
 import {waitFor} from "./time";
 
 export const asyncOps = {

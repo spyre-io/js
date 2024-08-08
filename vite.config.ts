@@ -7,6 +7,11 @@ export default defineConfig({
   base: "./",
   logLevel: "error",
   plugins: [dts({rollupTypes: true}), react()],
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "src"),
+    },
+  },
   build: {
     sourcemap: true,
     lib: {
@@ -16,11 +21,12 @@ export default defineConfig({
       fileName: (format) => `index.${format}.js`,
     },
     rollupOptions: {
-      external: ["react", "react-dom"],
+      external: ["react", "react-dom", "thirdweb"],
       output: {
         globals: {
           react: "React",
           "react-dom": "ReactDOM",
+          thirdweb: "Thirdweb",
         },
       },
     },

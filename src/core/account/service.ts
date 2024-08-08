@@ -1,11 +1,11 @@
 import {ApiAccount} from "@heroiclabs/nakama-js/dist/api.gen";
-import {INakamaClientService} from "../net/service";
-import {AsyncOp, Kv} from "../shared/types";
-import {logger} from "../util/logger";
-import {Web3Address} from "../web3/types";
+import {INakamaClientService} from "@/core/net/service";
+import {AsyncOp, Kv} from "@/core/shared/types";
+import {logger} from "@/core/util/logger";
+import {Web3Address} from "@/core/web3/types";
 import {User} from "./types";
-import {asyncOps} from "../../core/util/async";
-import {Dispatcher} from "../../core/shared/dispatcher";
+import {asyncOps} from "@/core/util/async";
+import {Dispatcher} from "@/core/shared/dispatcher";
 
 export const NullUser: User = {
   walletAddr: null,

@@ -1,22 +1,22 @@
 ////////////////////////////////////////////////////////////////////////// core
 
 // core/util
-export {logger, childLogger, getHistory} from "./core/util/logger";
-export {runFor, waitFor} from "./core/util/time";
-export {asyncOps, repeatAsync} from "./core/util/async";
-export {getBackoffMs, waitMs} from "./core/util/net";
+export {logger, childLogger, getHistory} from "@/core/util/logger";
+export {runFor, waitFor} from "@/core/util/time";
+export {asyncOps, repeatAsync} from "@/core/util/async";
+export {getBackoffMs, waitMs} from "@/core/util/net";
 
 // core/web3
-export {fromWei, toWei} from "./core/web3/helpers";
+export {fromWei, toWei} from "@/core/web3/helpers";
 
 // core/features/vault
 //export {getVaultValue, isVaultFull} from "./core/features/vaults/helpers";
 
 // core/account
-export type {User} from "./core/account/types";
+export type {User} from "@/core/account/types";
 
 // core/shared
-export type {AsyncOp} from "./core/shared/types";
+export type {AsyncOp} from "@/core/shared/types";
 
 // core/web3
 export type {
@@ -28,39 +28,39 @@ export type {
   SignStakeParameters,
   TxnStatus,
   Txn,
-} from "./core/web3/types";
+} from "@/core/web3/types";
 
 // client
-export {createSpyreClient} from "./client/client";
-export type {ISpyreClient, CreateSpyreClientOptions} from "./client/client";
+export {createSpyreClient} from "@/core/client";
+export type {ISpyreClient, CreateSpyreClientOptions} from "@/core/client";
 
 ///////////////////////////////////////////////////////////////////////// react
-export {SpyreClientProvider, SpyreConnect} from "./react/client-provider";
+export {SpyreClientProvider, SpyreConnect} from "@/react/client-provider";
 
 // react/components
-export {WalletConnection} from "./react/components/WalletConnection";
-export type {WalletConnectionProps} from "./react/components/WalletConnection";
+export {WalletConnection} from "@/react/components/WalletConnection";
+export type {WalletConnectionProps} from "@/react/components/WalletConnection";
 
 // react/hooks
-export {useClient, useDeviceId} from "./react/hooks/use-client";
+export {useClient, useDeviceId} from "@/react/hooks/use-client";
 export {
   useMultiplayerService,
   useNotificationService,
   useLeaderboardService,
-} from "./react/hooks/use-services";
+} from "@/react/hooks/use-services";
 
 // react/hooks/connection
 export {
   useConnectionService,
   useIsConnected,
-} from "./react/hooks/use-connection";
+} from "@/react/hooks/use-connection";
 
 // react/hooks/account
 export {
   useAccount,
   useAccountRefresh,
   useAccountUpdate,
-} from "./react/hooks/use-account";
+} from "@/react/hooks/use-account";
 
 // react/hooks/web3
 export {
@@ -78,6 +78,6 @@ export {
   useWeb3RequiresApproval,
   useWeb3Approve,
   useWeb3Deposit,
-} from "./react/hooks/use-web3";
+} from "@/react/hooks/use-web3";
 
 // redux?

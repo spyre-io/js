@@ -1,6 +1,6 @@
-import {Kv} from "core/shared/types";
-import {MatchInfo, MatchmakingInfo} from "core/shared/types.gen";
-import {Signature} from "core/web3/types";
+import {Kv} from "@/core/shared/types";
+import {MatchInfo, MatchmakingInfo} from "@/core/shared/types.gen";
+import {Signature} from "@/core/web3/types";
 
 export type BracketDefinition = {
   id: number;

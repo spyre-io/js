@@ -1,6 +1,6 @@
 import {useContext, useMemo} from "react";
 import {SpyreClientCtx} from "../client-provider";
-import {getDeviceId} from "../../client/client";
+import {getDeviceId} from "../../core/client";
 
 export const useClient = () => {
   const context = useContext(SpyreClientCtx);

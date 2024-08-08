@@ -1,4 +1,4 @@
-import {Kv} from "core/shared/types";
+import {Kv} from "@/core/shared/types";
 
 const dtf = new Intl.DateTimeFormat("en-US", {
   timeZone: "America/Chicago",

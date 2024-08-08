@@ -26,17 +26,17 @@ import {
   ThirdwebClient,
   ThirdwebContract,
 } from "thirdweb";
-import {asyncOps} from "../util/async";
-import {IAccountService} from "../account/service";
+import {asyncOps} from "@/core/util/async";
+import {IAccountService} from "@/core/account/service";
 import {ReadContractResult} from "thirdweb/dist/types/transaction/read-contract";
 import {
   WatchedValue,
   WatchedAsyncValue,
   SpyreError,
   CancelToken,
-} from "../shared/types";
-import {SpyreErrorCode} from "../shared/errors";
-import {IRpcService} from "../../core/net/service";
+} from "@/core/shared/types";
+import {SpyreErrorCode} from "@/core/shared/errors";
+import {IRpcService} from "@/core/net/service";
 import {DepositResponse, GetNonceResponse, PermitResponse} from "./types.gen";
 
 /*export const useHangmanDomain = () => {

@@ -1,0 +1,23 @@
+export var SpyreErrorCode;
+(function (SpyreErrorCode) {
+    SpyreErrorCode[SpyreErrorCode["OK"] = 0] = "OK";
+    SpyreErrorCode[SpyreErrorCode["CANCELED"] = 1] = "CANCELED";
+    SpyreErrorCode[SpyreErrorCode["UNKNOWN"] = 2] = "UNKNOWN";
+    SpyreErrorCode[SpyreErrorCode["INVALID_ARGUMENT"] = 3] = "INVALID_ARGUMENT";
+    SpyreErrorCode[SpyreErrorCode["DEADLINE_EXCEEDED"] = 4] = "DEADLINE_EXCEEDED";
+    SpyreErrorCode[SpyreErrorCode["NOT_FOUND"] = 5] = "NOT_FOUND";
+    SpyreErrorCode[SpyreErrorCode["ALREADY_EXISTS"] = 6] = "ALREADY_EXISTS";
+    SpyreErrorCode[SpyreErrorCode["PERMISSION_DENIED"] = 7] = "PERMISSION_DENIED";
+    SpyreErrorCode[SpyreErrorCode["RESOURCE_EXHAUSTED"] = 8] = "RESOURCE_EXHAUSTED";
+    SpyreErrorCode[SpyreErrorCode["FAILED_PRECONDITION"] = 9] = "FAILED_PRECONDITION";
+    SpyreErrorCode[SpyreErrorCode["ABORTED"] = 10] = "ABORTED";
+    SpyreErrorCode[SpyreErrorCode["OUT_OF_RANGE"] = 11] = "OUT_OF_RANGE";
+    SpyreErrorCode[SpyreErrorCode["UNIMPLEMENTED"] = 12] = "UNIMPLEMENTED";
+    SpyreErrorCode[SpyreErrorCode["INTERNAL"] = 13] = "INTERNAL";
+    SpyreErrorCode[SpyreErrorCode["UNAVAILABLE"] = 14] = "UNAVAILABLE";
+    SpyreErrorCode[SpyreErrorCode["DATA_LOSS"] = 15] = "DATA_LOSS";
+    SpyreErrorCode[SpyreErrorCode["UNAUTHENTICATED"] = 16] = "UNAUTHENTICATED";
+    SpyreErrorCode[SpyreErrorCode["UNMARSHALLING"] = 17] = "UNMARSHALLING";
+    SpyreErrorCode[SpyreErrorCode["MARSHALLING"] = 18] = "MARSHALLING";
+    SpyreErrorCode[SpyreErrorCode["PLUGIN"] = 100] = "PLUGIN";
+})(SpyreErrorCode || (SpyreErrorCode = {}));

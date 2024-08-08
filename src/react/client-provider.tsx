@@ -1,11 +1,5 @@
 import {createWallet, inAppWallet} from "thirdweb/wallets";
 import {
-  createSpyreClient,
-  CreateSpyreClientOptions,
-  ISpyreClient,
-} from "../client/client";
-import {createContext, PropsWithChildren, useMemo, useRef} from "react";
-import {
   AutoConnect,
   ConnectEmbed,
   darkTheme,
@@ -14,9 +8,15 @@ import {
   useConnectionManager,
 } from "thirdweb/react";
 import {createThirdwebClient, ThirdwebClient} from "thirdweb";
-import {useClient} from "./hooks/use-client";
-import {ThirdWebWeb3Service} from "../core/web3/service";
+import {createContext, PropsWithChildren, useMemo, useRef} from "react";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
+import {
+  createSpyreClient,
+  CreateSpyreClientOptions,
+  ISpyreClient,
+} from "@/core/client";
+import {useClient} from "@/react/hooks/use-client";
+import {ThirdWebWeb3Service} from "@/core/web3/service";
 
 export const SpyreClientCtx = createContext<ISpyreClient | undefined>(
   undefined,

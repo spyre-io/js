@@ -1,11 +1,11 @@
 import {useMemo} from "react";
-import {defaultTheme, wallets} from "../client-provider";
+import {defaultTheme, wallets} from "@/react/client-provider";
 import {
   useWeb3Config,
   useWeb3ConnectionStatus,
   useWeb3Thirdweb,
   useWeb3ThirdwebNetwork,
-} from "../hooks/use-web3";
+} from "@/react/hooks/use-web3";
 import {ConnectButton, Theme} from "thirdweb/react";
 
 export type WalletConnectionProps = {

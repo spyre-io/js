@@ -1,5 +1,5 @@
-import {INakamaClientService} from "core/net/service";
-import {Dispatcher, IDispatcher} from "../shared/dispatcher";
+import {INakamaClientService} from "@/core/net/service";
+import {Dispatcher, IDispatcher} from "@/core/shared/dispatcher";
 import {Notification} from "./types";
 
 export interface INotificationService extends IDispatcher<Notification> {

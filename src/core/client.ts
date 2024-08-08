@@ -1,30 +1,22 @@
-import {ILogTarget} from "core/util/logger";
-import {AccountService, IAccountService} from "../core/account/service";
-import {
-  IMultiplayerService,
-  MultiplayerService,
-} from "../core/multiplayer/service";
+import {ILogTarget} from "./util/logger";
+import {AccountService, IAccountService} from "./account/service";
+import {IMultiplayerService, MultiplayerService} from "./multiplayer/service";
 import {
   ConnectionService,
   IConnectionService,
   IRpcService,
-} from "../core/net/service";
+} from "./net/service";
 import {
   INotificationService,
   NotificationService,
-} from "../core/notifications/service";
-import {IWeb3Service, ThirdWebWeb3Service} from "../core/web3/service";
-import {Web3Config} from "../core/web3/types";
+} from "./notifications/service";
+import {IWeb3Service, ThirdWebWeb3Service} from "./web3/service";
+import {Web3Config} from "./web3/types";
 
-import {base, baseSepolia as baseSepoliaTestnet} from "thirdweb/chains";
 import {v4, validate} from "uuid";
-import {
-  ILeaderboardService,
-  LeaderboardService,
-} from "../core/leaderboards/service";
+import {ILeaderboardService, LeaderboardService} from "./leaderboards/service";
 import {ThirdwebClient} from "thirdweb";
 import {ConnectionManager} from "thirdweb/wallets";
-import {QueryClient} from "@tanstack/react-query";
 
 export type CreateSpyreClientOptions = {
   web3: Web3Config;
