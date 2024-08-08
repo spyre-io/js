@@ -32,12 +32,6 @@ importers:
       thirdweb:
         specifier: ^5.43.2
         version: 5.43.2(@types/react-dom@18.3.0)(@types/react@18.3.3)(ethers@6.13.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.5.4)
-      typedoc:
-        specifier: ^0.26.5
-        version: 0.26.5(typescript@5.5.4)
-      typedoc-github-theme:
-        specifier: ^0.1.1
-        version: 0.1.1(typedoc@0.26.5(typescript@5.5.4))
       uuid:
         specifier: ^10.0.0
         version: 10.0.0
@@ -99,6 +93,12 @@ importers:
       tslib:
         specifier: ^2.6.2
         version: 2.6.3
+      typedoc:
+        specifier: ^0.26.5
+        version: 0.26.5(typescript@5.5.4)
+      typedoc-github-theme:
+        specifier: ^0.1.1
+        version: 0.1.1(typedoc@0.26.5(typescript@5.5.4))
       typescript:
         specifier: ^5.4.2
         version: 5.5.4
