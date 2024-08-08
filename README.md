@@ -6,7 +6,7 @@ A WIP.
 
 ```
 pnpm install
-pnpm start
+pnpm dev
 ```
 
 ### Roadmap

@@ -20,8 +20,8 @@
     "dist"
   ],
   "scripts": {
-    "dev": "tsc -w",
-    "build": "tsc",
+    "dev": "nodemon -x pnpm build",
+    "build": "tsc && node ./scripts/fix-tsc.js",
     "doc": "typedoc --out docs --plugin typedoc-github-theme --theme typedoc-github-theme src",
     "prepare": "husky",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
@@ -43,6 +43,7 @@
     "@tanstack/react-query": "5.29.2",
     "@types/uuid": "^10.0.0",
     "ethers": "^6.13.2",
+    "pino-pretty": "^11.2.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "thirdweb": "^5.43.2",
@@ -63,6 +64,7 @@
     "eslint-plugin-unused-imports": "^4.0.1",
     "husky": "^9.1.4",
     "lint-staged": "^15.2.7",
+    "nodemon": "^3.1.4",
     "prettier": "^3.3.3",
     "stylelint": "^16.2.1",
     "stylelint-config-recommended": "^14.0.0",
