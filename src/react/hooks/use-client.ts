@@ -1,6 +1,9 @@
-import {useContext, useMemo} from "react";
+import {useCallback, useContext, useMemo} from "react";
 import {SpyreClientCtx} from "../client-provider";
 import {getDeviceId} from "../../core/client";
+import {useNotifHandler} from "./use-notifications";
+import {NotificationCodes} from "@/core/notifications/types";
+import {useQueryClient} from "@tanstack/react-query";
 
 /**
  * Returns the current {@link ISpyreClient} implementaion.
@@ -15,6 +18,12 @@ export const useClient = () => {
   if (!context) {
     throw new Error("useClient must be used within a SpyreClientProvider.");
   }
+
+  const queryClient = useQueryClient();
+  const invalidateMatches = useCallback(() => {
+    // Invalidate match + matches query
+  }, [context, queryClient]);
+  //useNotifHandler(NotificationCodes.BlockchainStakeStatus, invalidateMatches);
 
   return context;
 };

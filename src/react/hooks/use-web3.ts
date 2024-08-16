@@ -1,5 +1,3 @@
-"use-client";
-
 import {useActiveWalletConnectionStatus} from "thirdweb/react";
 import {useAccount} from "./use-account";
 import {useClient} from "./use-client";

@@ -1,4 +1,9 @@
-import {MatchmakingAcceptResponse, MatchmakingResponse} from "./types.gen";
+import {
+  BracketDefinition,
+  GetBracketsResponse,
+  MatchmakingAcceptResponse,
+  MatchmakingResponse,
+} from "./types.gen";
 import {MatchInfo, MatchmakingInfo} from "@/core/shared/types.gen";
 import {logger} from "@/core/util/logger";
 import {Kv} from "@/core/shared/types";
@@ -11,6 +16,9 @@ import {IMatchHandler, IMatchHandlerFactory, NullMatchHandler} from "./handler";
 import {IMatchContext, MatchContext, NullMatchContext} from "./context";
 
 export interface IMultiplayerService {
+  get brackets(): BracketDefinition[];
+  refreshBrackets(): Promise<void>;
+
   findMatches(bracketId: number): Promise<void>;
   accept(
     bracket: MatchmakingBracketInfo,
@@ -42,6 +50,8 @@ export class MultiplayerService implements IMultiplayerService {
   context: IMatchContext = new NullMatchContext();
   handler: IMatchHandler = new NullMatchHandler();
 
+  _brackets: BracketDefinition[] = [];
+
   constructor(
     rpc: IRpcService,
     account: IAccountService,
@@ -52,6 +62,19 @@ export class MultiplayerService implements IMultiplayerService {
     this.account = account;
     this.web3 = web3;
     this.connection = connection;
+  }
+
+  get brackets(): BracketDefinition[] {
+    return this._brackets;
+  }
+
+  async refreshBrackets(): Promise<void> {
+    const res = await this.rpc.call<GetBracketsResponse>(
+      "matchmaking/get-brackets",
+      {game: "hangman"},
+    );
+
+    this._brackets = res.brackets.sort((a, b) => a.id - b.id);
   }
 
   join = async (

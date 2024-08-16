@@ -36,7 +36,7 @@ export type {IRpcService, IConnectionService} from "@/core/net/interfaces";
 
 // core/notifications
 export type {INotificationService} from "@/core/notifications/service";
-export type {Notification} from "@/core/notifications/types";
+export type {Notification, NotificationCodes} from "@/core/notifications/types";
 
 // core/shared
 export type {
@@ -89,15 +89,8 @@ export type {WalletConnectionProps} from "@/react/components/WalletConnection";
 export {useClient, useDeviceId} from "@/react/hooks/use-client";
 export {
   useMultiplayerService,
-  useNotificationService,
   useLeaderboardService,
 } from "@/react/hooks/use-services";
-
-// react/hooks/connection
-export {
-  useConnectionService,
-  useIsConnected,
-} from "@/react/hooks/use-connection";
 
 // react/hooks/account
 export {
@@ -108,6 +101,21 @@ export {
 
 // react/hooks/history
 export {useHistoryFind, useHistoryGet} from "@/react/hooks/use-history";
+
+// react/hooks/connection
+export {
+  useConnectionService,
+  useIsConnected,
+} from "@/react/hooks/use-connection";
+
+// react/hooks/multiplayer
+export {useBrackets} from "@/react/hooks/use-multiplayer";
+
+// react/hooks/notifications
+export {useNotifHandler} from "@/react/hooks/use-notifications";
+
+// react/hooks/vault
+export {useVaults, useVaultCollect} from "@/react/hooks/use-vaults";
 
 // react/hooks/web3
 export {

@@ -22,6 +22,7 @@ import {ThirdwebClient} from "thirdweb";
 import {ConnectionManager} from "thirdweb/wallets";
 import {Dispatcher} from "@/core/shared/dispatcher";
 import {HistoryService, IHistoryService} from "@/core/history/service";
+import {IVaultService, VaultService} from "./vault/service";
 
 /**
  * Options for creating a new {@link ISpyreClient} instance.
@@ -106,6 +107,11 @@ export interface ISpyreClient {
   rpc: IRpcService;
 
   /**
+   * Retrieves the {@link IVaultService} instance. This provides access to the vault service, which allows you to manage vaults.
+   */
+  vaults: IVaultService;
+
+  /**
    * Initializes the client. This should be called before using any other services.
    *
    * @param logConfig - Optional logging configuration.
@@ -123,6 +129,7 @@ class SpyreClient implements ISpyreClient {
     public readonly rpc: IRpcService,
     public readonly leaderboards: ILeaderboardService,
     public readonly history: IHistoryService,
+    public readonly vaults: IVaultService,
   ) {
     //
   }
@@ -166,6 +173,7 @@ export function createSpyreClient(
 
   const account = new AccountService(connection, events);
   const history = new HistoryService(connection);
+  const vaults = new VaultService(connection);
 
   const web3 = new ThirdWebWeb3Service(
     events,
@@ -191,5 +199,6 @@ export function createSpyreClient(
     connection,
     leaderboards,
     history,
+    vaults,
   );
 }
