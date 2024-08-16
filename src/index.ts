@@ -115,7 +115,7 @@ export {useBrackets} from "@/react/hooks/use-multiplayer";
 export {useNotifHandler} from "@/react/hooks/use-notifications";
 
 // react/hooks/vault
-export {useVaults, useVaultCollect} from "@/react/hooks/use-vaults";
+export {useVaultCollect, useVaultValue} from "@/react/hooks/use-vaults";
 
 // react/hooks/web3
 export {
