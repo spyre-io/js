@@ -109,13 +109,13 @@ export {
 } from "@/react/hooks/use-connection";
 
 // react/hooks/multiplayer
-export {useBrackets} from "@/react/hooks/use-multiplayer";
+export {useMpBrackets} from "@/react/hooks/use-multiplayer";
 
 // react/hooks/notifications
 export {useNotifHandler} from "@/react/hooks/use-notifications";
 
 // react/hooks/vault
-export {useVaultCollect, useVaultValue} from "@/react/hooks/use-vaults";
+export {useVaultCollect, useVault} from "@/react/hooks/use-vaults";
 
 // react/hooks/web3
 export {

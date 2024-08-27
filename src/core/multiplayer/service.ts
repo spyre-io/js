@@ -77,35 +77,6 @@ export class MultiplayerService implements IMultiplayerService {
     this._brackets = res.brackets.sort((a, b) => a.id - b.id);
   }
 
-  join = async (
-    matchId: string,
-    meta: Kv<string>,
-    retries: number = 3,
-  ): Promise<Match> => {
-    return this.connection.join(matchId, meta, retries);
-  };
-
-  leave(): Promise<void> {
-    return this.connection.leave();
-  }
-
-  send(
-    opCode: number,
-    payload: string | Uint8Array,
-    retries?: number,
-  ): Promise<void> {
-    if (!this.match) {
-      throw new Error("No match");
-    }
-
-    return this.connection.sendMatchState(
-      this.match.match_id,
-      opCode,
-      payload,
-      retries,
-    );
-  }
-
   async findMatches(bracketId: number): Promise<void> {
     this.match = null;
     this.matchmakingInfo = null;
@@ -216,5 +187,34 @@ export class MultiplayerService implements IMultiplayerService {
 
     this.handler = factory.instance(match.match_id);
     this.handler.joined(this.context);
+  }
+
+  join = async (
+    matchId: string,
+    meta: Kv<string>,
+    retries: number = 3,
+  ): Promise<Match> => {
+    return this.connection.join(matchId, meta, retries);
+  };
+
+  leave(): Promise<void> {
+    return this.connection.leave();
+  }
+
+  send(
+    opCode: number,
+    payload: string | Uint8Array,
+    retries?: number,
+  ): Promise<void> {
+    if (!this.match) {
+      throw new Error("No match");
+    }
+
+    return this.connection.sendMatchState(
+      this.match.match_id,
+      opCode,
+      payload,
+      retries,
+    );
   }
 }

@@ -8,25 +8,15 @@ export const useVault = (name: string) => {
   const query = useCallback(async () => {
     await vaults.refresh();
 
-    return vaults.vaults.find((v) => v.name === name);
+    console.log("useVault()");
+
+    const vault = vaults.vaults.find((v) => v.name === name);
+    return {vault, value: vault ? vaults.getValue(vault) : 0};
   }, [vaults]);
 
   return useQuery({
     queryKey: ["vault", name],
     queryFn: query,
-  });
-};
-
-export const useVaultValue = (name: string) => {
-  const v = useClient().vaults;
-  const {isPending, data: vault} = useVault(name);
-
-  const find = useCallback(() => (vault ? v.getValue(vault) : 0), [v, vault]);
-
-  return useQuery({
-    queryKey: ["vault", name, "value"],
-    queryFn: find,
-    enabled: !isPending,
   });
 };
 

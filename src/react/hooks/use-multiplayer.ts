@@ -2,7 +2,7 @@ import {useCallback} from "react";
 import {useClient} from "./use-client";
 import {useQuery} from "@tanstack/react-query";
 
-export const useBrackets = () => {
+export const useMpBrackets = () => {
   const mp = useClient().multiplayer;
 
   const fn = useCallback(async () => {
@@ -16,3 +16,7 @@ export const useBrackets = () => {
     queryFn: fn,
   });
 };
+
+export const useMpMatchmakingFind = () => {};
+
+export const useMpMatchmakingAccept = () => {};
