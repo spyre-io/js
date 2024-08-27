@@ -104,6 +104,11 @@ export interface IWeb3Service {
   get withdrawAfter(): WatchedAsyncValue<Date>;
 
   /**
+   * An in-app wallet means that we can make wallet operations without user interaction.
+   */
+  get isInAppWallet(): WatchedValue<boolean>;
+
+  /**
    * Switches the user's wallet to the correct chain given by the configuration.
    */
   switchChain(): Promise<void>;
@@ -159,6 +164,7 @@ export class ThirdWebWeb3Service implements IWeb3Service {
   _linkedAddress: WatchedValue<Web3Address | null> =
     new WatchedValue<Web3Address | null>(null);
   _needsToSwitchChains: WatchedValue<boolean> = new WatchedValue(false);
+  _isInAppWallet: WatchedValue<boolean> = new WatchedValue(false);
 
   public readonly stakingContract: ThirdwebContract<any>;
   public readonly usdcContract: ThirdwebContract<any>;
@@ -275,6 +281,12 @@ export class ThirdWebWeb3Service implements IWeb3Service {
       );
     });
 
+    const thirdWebWallet = this._connectionManager.activeWalletStore;
+    this._isInAppWallet.setValue(thirdWebWallet.getValue()?.id === "inApp");
+    thirdWebWallet.subscribe(() => {
+      this._isInAppWallet.setValue(thirdWebWallet.getValue()?.id === "inApp");
+    });
+
     const thirdwebActiveChain = this._connectionManager.activeWalletChainStore;
     this._needsToSwitchChains.setValue(
       thirdwebActiveChain.getValue()?.id !== this.network.id,
@@ -306,6 +318,10 @@ export class ThirdWebWeb3Service implements IWeb3Service {
 
   get linkedAddress(): WatchedValue<Web3Address | null> {
     return this._linkedAddress;
+  }
+
+  get isInAppWallet(): WatchedValue<boolean> {
+    return this._isInAppWallet;
   }
 
   link = async (cancelToken?: CancelToken): Promise<void> => {

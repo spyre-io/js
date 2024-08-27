@@ -133,6 +133,7 @@ export {
   useWeb3RequiresApproval,
   useWeb3Approve,
   useWeb3Deposit,
+  useWeb3IsInAppWallet,
   useWeb3Link,
 } from "@/react/hooks/use-web3";
 

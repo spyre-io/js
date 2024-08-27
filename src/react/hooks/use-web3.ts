@@ -129,6 +129,15 @@ export const useWeb3NeedsSwitchChain = (): boolean => {
   );
 };
 
+export const useWeb3IsInAppWallet = (): boolean => {
+  const web3 = useClient().web3;
+
+  return useSyncExternalStore(
+    web3.isInAppWallet.watch,
+    web3.isInAppWallet.getValue,
+  );
+};
+
 export const useWeb3Link = () => {
   const web3 = useClient().web3;
 
