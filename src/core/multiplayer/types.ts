@@ -1,5 +1,8 @@
 import {Signature} from "@/core/web3/types";
 
+export const OpCodeInitClock = 1;
+export const OpCodeInitNoop = 2;
+
 export type MatchmakingAcceptSignals = {
   onSignStart?: () => void;
   onSignComplete?: (signature: Signature) => void;

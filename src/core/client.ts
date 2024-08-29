@@ -23,6 +23,7 @@ import {ConnectionManager} from "thirdweb/wallets";
 import {Dispatcher} from "@/core/shared/dispatcher";
 import {HistoryService, IHistoryService} from "@/core/history/service";
 import {IVaultService, VaultService} from "./vault/service";
+import {ClockService, IClockService} from "./clock/service";
 
 /**
  * Options for creating a new {@link ISpyreClient} instance.
@@ -112,6 +113,11 @@ export interface ISpyreClient {
   vaults: IVaultService;
 
   /**
+   * Retrieves the {@link IClockService} instance. This provides access to an accurate server time offset.
+   */
+  clock: IClockService;
+
+  /**
    * Initializes the client. This should be called before using any other services.
    *
    * @param logConfig - Optional logging configuration.
@@ -130,6 +136,7 @@ class SpyreClient implements ISpyreClient {
     public readonly leaderboards: ILeaderboardService,
     public readonly history: IHistoryService,
     public readonly vaults: IVaultService,
+    public readonly clock: IClockService,
   ) {
     //
   }
@@ -189,6 +196,10 @@ export function createSpyreClient(
     web3,
     connection,
   );
+  const clock = new ClockService(multiplayer);
+
+  // todo: fix circular dependency
+  multiplayer.init(clock);
 
   return new SpyreClient(
     account,
@@ -200,5 +211,6 @@ export function createSpyreClient(
     leaderboards,
     history,
     vaults,
+    clock,
   );
 }

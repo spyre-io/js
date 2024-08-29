@@ -7,7 +7,7 @@ import {
 } from "./types";
 
 export interface IMatchHandlerFactory {
-  instance(matchId: string): IMatchHandler;
+  instance(): IMatchHandler;
 }
 
 export interface IMatchHandler {

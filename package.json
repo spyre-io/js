@@ -44,7 +44,7 @@
     "@types/uuid": "^10.0.0",
     "ethers": "^6.13.2",
     "pino-pretty": "^11.2.2",
-    "react": "^18.2.0",
+    "react": "^18.3.1",
     "react-dom": "^18.2.0",
     "thirdweb": "^5.43.2",
     "uuid": "^10.0.0"

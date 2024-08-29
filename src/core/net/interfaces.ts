@@ -6,6 +6,10 @@ export interface INakamaClientService {
   getApi<T>(fn: AsyncClientFn<T>, retries: number): Promise<T>;
 }
 
+export interface IMatchHandler {
+  onData: (opCode: number, data: Uint8Array) => void;
+}
+
 /**
  * This describes an object that manages the connection to Spyre services.
  */
@@ -38,11 +42,17 @@ export interface IConnectionService {
    * @param matchId The match ID to join.
    * @param meta A key-value map of strings.
    * @param retries The number of times to retry if the join
+   * @param handler The function to handle events from the socket.
    * @returns A promise that resolves to the match object.
    * @throws If the match cannot be joined.
    *
    */
-  join(matchId: string, meta: Kv<string>, retries: number): Promise<Match>;
+  join(
+    matchId: string,
+    meta: Kv<string>,
+    retries: number,
+    handler: (opCode: number, payload: Uint8Array) => void,
+  ): Promise<Match>;
 
   /**
    * Leaves the current match.

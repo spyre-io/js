@@ -1,32 +1,52 @@
 import {Match} from "@heroiclabs/nakama-js";
 import {IConnectionService} from "@/core/net/interfaces";
-import {logger} from "../util/logger";
+import {childLogger, logger} from "../util/logger";
+import {Dispatcher} from "../shared/dispatcher";
+import {ClockService, IClockService} from "../clock/service";
+import {OpCodeInitClock} from "./types";
 
 export interface IMatchContext {
   get matchId(): string;
 
-  addHandler<T>(opCode: number, handler: (payload: T) => void): () => void;
+  addHandler(
+    opCode: number,
+    handler: (payload: Uint8Array) => void,
+  ): () => void;
+  onMatchData(opCode: number, payload: Uint8Array): void;
 
   send(opCode: number, payload: any): void;
   quit(): void;
 }
 
 export class MatchContext implements IMatchContext {
+  private readonly _dispatcher: Dispatcher<Uint8Array> = new Dispatcher();
+
   constructor(
     private readonly connection: IConnectionService,
+    private readonly clock: ClockService,
     public readonly match: Match,
   ) {
-    //
+    this._dispatcher.addHandler(OpCodeInitClock, (message) => {
+      const raw = new TextDecoder("utf-8").decode(message);
+      const {d} = JSON.parse(raw);
+
+      clock.addLatencyMeasurement(d);
+    });
   }
 
   get matchId(): string {
     return this.match.match_id;
   }
 
-  addHandler<T>(opCode: number, handler: (payload: T) => void): () => void {
-    logger.debug(`MatchContext.addHandler(@opCode, @handler)`, opCode, handler);
+  addHandler(
+    opCode: number,
+    handler: (payload: Uint8Array) => void,
+  ): () => void {
+    return this._dispatcher.addHandler(opCode, handler);
+  }
 
-    return () => {};
+  onMatchData(opCode: number, payload: Uint8Array): void {
+    this._dispatcher.on(opCode, payload);
   }
 
   async send(opCode: number, payload: any): Promise<void> {
@@ -56,6 +76,10 @@ export class NullMatchContext implements IMatchContext {
       handler,
     );
     return () => {};
+  }
+
+  onMatchData(opCode: number, payload: any): void {
+    //
   }
 
   send(opCode: number, payload: any): void {

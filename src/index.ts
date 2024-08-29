@@ -4,6 +4,9 @@
 export type {User} from "@/core/account/types";
 export type {IAccountService} from "@/core/account/service";
 
+// core/clock
+export type {IClockService} from "@/core/clock/service";
+
 // core/history
 export type {IHistoryService} from "@/core/history/service";
 export type {HistorySearchCriteria} from "@/core/history/types";
@@ -99,6 +102,9 @@ export {
   useAccountUpdate,
 } from "@/react/hooks/use-account";
 
+// react/hooks/clock
+export {useClockOffsetMillis} from "@/react/hooks/use-clock";
+
 // react/hooks/history
 export {useHistoryFind, useHistoryGet} from "@/react/hooks/use-history";
 
@@ -109,7 +115,15 @@ export {
 } from "@/react/hooks/use-connection";
 
 // react/hooks/multiplayer
-export {useMpBrackets} from "@/react/hooks/use-multiplayer";
+export {
+  useMpBrackets,
+  useMpMatchmakingFind,
+  useMpMatchmakingAcceptAndJoin,
+  useMpMatchmakingInfo,
+  useMpMatchmakingJoinIds,
+  useMpMatch,
+  useMpMatchmakingMatchInfo,
+} from "@/react/hooks/use-multiplayer";
 
 // react/hooks/notifications
 export {useNotifHandler} from "@/react/hooks/use-notifications";
