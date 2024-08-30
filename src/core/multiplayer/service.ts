@@ -220,6 +220,7 @@ export class MultiplayerService implements IMultiplayerService {
       retries,
       this._handleMessages,
     );
+
     this.match.setValue(match);
 
     if (onJoinComplete) {

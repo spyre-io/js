@@ -1,10 +1,7 @@
 import {useCallback, useSyncExternalStore} from "react";
 import {useClient} from "./use-client";
 import {useMutation, useQuery} from "@tanstack/react-query";
-import {
-  MatchmakingAcceptSignals,
-  MatchmakingBracketInfo,
-} from "@/core/multiplayer/types";
+import {MatchmakingAcceptSignals} from "@/core/multiplayer/types";
 import {IMatchHandlerFactory} from "@/core/multiplayer/handler";
 
 export const useMpBrackets = () => {
@@ -78,8 +75,18 @@ export const useMpMatchmakingMatchInfo = () => {
   return useSyncExternalStore(mp.matchInfo.watch, mp.matchInfo.getValue);
 };
 
-export const useMpMatch = () => {
+export const useMpMatchId = () => {
   const mp = useClient().multiplayer;
 
-  return useSyncExternalStore(mp.match.watch, mp.match.getValue);
+  const get = useCallback(() => {
+    const match = mp.match.getValue();
+    if (!match) {
+      return null;
+    }
+
+    const {match_id} = match;
+    return match_id;
+  }, [mp]);
+
+  return useSyncExternalStore(mp.match.watch, get);
 };

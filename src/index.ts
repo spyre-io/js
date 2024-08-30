@@ -121,7 +121,7 @@ export {
   useMpMatchmakingAcceptAndJoin,
   useMpMatchmakingInfo,
   useMpMatchmakingJoinIds,
-  useMpMatch,
+  useMpMatchId,
   useMpMatchmakingMatchInfo,
 } from "@/react/hooks/use-multiplayer";
 
