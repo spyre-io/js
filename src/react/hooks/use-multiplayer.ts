@@ -47,10 +47,7 @@ export const useMpMatchmakingAcceptAndJoin = () => {
     }: {
       factory: IMatchHandlerFactory;
       signals?: MatchmakingAcceptSignals;
-    }) => {
-      console.log("accept and join");
-      return await mp.acceptAndJoin(factory, signals);
-    },
+    }) => await mp.acceptAndJoin(factory, signals),
     [mp],
   );
 
