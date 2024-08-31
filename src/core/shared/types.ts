@@ -1,5 +1,4 @@
 import {Dispatcher} from "./dispatcher";
-import {SpyreErrorCode} from "./errors";
 
 export type Kv<T> = {[k: string]: T};
 
@@ -45,7 +44,7 @@ export class SpyreError extends Error {
 
     public readonly errors: any[] = [],
   ) {
-    super(`${message}\n${errors.map((e) => e.message).join("\n\t")}`);
+    super(`${code}:${message}\n${errors.map((e) => e.message).join("\n\t")}`);
   }
 }
 export class WatchedValue<T> {

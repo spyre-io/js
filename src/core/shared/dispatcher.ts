@@ -35,7 +35,7 @@ export class Dispatcher<T> implements IDispatcher<T> {
     if (errors.length > 0) {
       throw new SpyreError(
         SpyreErrorCode.PLUGIN,
-        "Handler threw an error.",
+        `Handler threw an error on code '${code}'.`,
         errors,
       );
     }
