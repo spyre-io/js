@@ -41,6 +41,7 @@ export class MultiplayerService
   private _context: IMatchContext | null = null;
   private _handler: IMatchHandler | null = null;
   private _brackets: BracketDefinition[] = [];
+  private _dataQueue: {opCode: number; data: Uint8Array}[] = [];
 
   private clock: ClockService | null = null;
 
@@ -64,7 +65,7 @@ export class MultiplayerService
     if (this._context) {
       this._context.onMatchData(opCode, data);
     } else {
-      logger.warn("Received '@OpCode' with no context to handle it.", opCode);
+      this._dataQueue.push({opCode, data});
     }
   };
 
@@ -200,6 +201,13 @@ export class MultiplayerService
 
     this._context = new MatchContext(this.connection, this.clock!, match);
     this._handler.joined(this._context);
+
+    // process any queued data
+    const queue = this._dataQueue.concat();
+    this._dataQueue.length = 0;
+    for (const {opCode, data} of queue) {
+      this._context.onMatchData(opCode, data);
+    }
   };
 
   leave(): Promise<void> {

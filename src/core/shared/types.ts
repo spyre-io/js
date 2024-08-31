@@ -44,7 +44,9 @@ export class SpyreError extends Error {
 
     public readonly errors: any[] = [],
   ) {
-    super(`${code}:${message}\n${errors.map((e) => e.message).join("\n\t")}`);
+    super(
+      `${code}:${message}\n${errors.map((e) => `${e.message}\n${e.stack}`).join("\n\n")}`,
+    );
   }
 }
 export class WatchedValue<T> {

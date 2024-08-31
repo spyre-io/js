@@ -11,15 +11,10 @@ export class Dispatcher<T> implements IDispatcher<T> {
   _removalQueue: (() => void)[] = [];
 
   on(code: number, payload: T) {
-    const errors = [];
     const handlers = this._handlers[code];
     if (handlers) {
       for (const handler of handlers) {
-        try {
-          handler(payload);
-        } catch (error) {
-          errors.push(error);
-        }
+        handler(payload);
       }
     }
 
@@ -29,15 +24,6 @@ export class Dispatcher<T> implements IDispatcher<T> {
         remove();
       }
       this._removalQueue.length = 0;
-    }
-
-    // throw error
-    if (errors.length > 0) {
-      throw new SpyreError(
-        SpyreErrorCode.PLUGIN,
-        `Handler threw an error on code '${code}'.`,
-        errors,
-      );
     }
   }
 
