@@ -104,8 +104,6 @@ export class VaultService implements IVaultService {
     const index = this._vaults.findIndex((v) => v.name === updatedVault.name);
     if (index !== -1) {
       this._vaults[index] = updatedVault;
-
-      console.log("collect()");
     }
 
     this._status = asyncOps.success();

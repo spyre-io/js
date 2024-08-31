@@ -264,8 +264,6 @@ export class ThirdWebWeb3Service implements IWeb3Service {
       );
     }
 
-    console.log(res);
-
     if (!res.success) {
       throw new SpyreError(
         SpyreErrorCode.UNAVAILABLE,

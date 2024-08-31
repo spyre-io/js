@@ -8,8 +8,6 @@ export const useVault = (name: string) => {
   const query = useCallback(async () => {
     await vaults.refresh();
 
-    console.log("useVault()");
-
     const vault = vaults.vaults.find((v) => v.name === name);
     return {vault, value: vault ? vaults.getValue(vault) : 0};
   }, [vaults]);
