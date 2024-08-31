@@ -1,11 +1,7 @@
 import {INakamaClientService} from "@/core/net/interfaces";
-import {Dispatcher, IDispatcher} from "@/core/shared/dispatcher";
+import {Dispatcher} from "@/core/shared/dispatcher";
 import {Notification} from "./types";
-
-export interface INotificationService extends IDispatcher<Notification> {
-  list(count: number): Promise<Notification[]>;
-  delete(ids: string[]): Promise<void>;
-}
+import {INotificationService} from "./interfaces";
 
 export class NotificationService
   extends Dispatcher<Notification>

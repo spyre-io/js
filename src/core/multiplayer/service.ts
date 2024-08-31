@@ -5,17 +5,18 @@ import {
   MatchmakingResponse,
 } from "./types.gen";
 import {MatchInfo, MatchmakingInfo} from "@/core/shared/types.gen";
-import {logger} from "@/core/util/logger";
 import {Kv, WatchedValue} from "@/core/shared/types";
-import {Match, MatchData} from "@heroiclabs/nakama-js";
-import {IConnectionService, IRpcService} from "@/core/net/interfaces";
-import {IWeb3Service} from "@/core/web3/service";
-import {MatchmakingAcceptSignals, MatchmakingBracketInfo} from "./types";
-import {NullMatchHandler} from "./handler";
-import {MatchContext, NullMatchContext} from "./context";
-import {ClockService} from "../clock/service";
-import {Signature} from "../web3/types";
-import {IMatchDataHandler} from "../net/service";
+import {Match} from "@heroiclabs/nakama-js";
+import {
+  IConnectionService,
+  IMatchDataHandler,
+  IRpcService,
+} from "@/core/net/interfaces";
+import {IWeb3Service} from "@/core/web3/interfaces";
+import {MatchmakingAcceptSignals} from "./types";
+import {MatchContext} from "./context";
+import {ClockService} from "@/core/clock/service";
+import {Signature} from "@/core/web3/types";
 import {
   IMatchContext,
   IMatchHandler,
@@ -23,6 +24,9 @@ import {
   IMultiplayerService,
 } from "./interfaces";
 import {getMatchmakingBracketInfo} from "./util";
+import {childLogger} from "@/core/util/logger";
+
+const logger = childLogger("becky:multiplayer");
 
 export class MultiplayerService
   implements IMultiplayerService, IMatchDataHandler
@@ -34,8 +38,8 @@ export class MultiplayerService
     new WatchedValue<MatchmakingInfo | null>(null);
   matchJoinIds: WatchedValue<string[]> = new WatchedValue<string[]>([]);
 
-  private _context: IMatchContext = new NullMatchContext();
-  private _handler: IMatchHandler = new NullMatchHandler();
+  private _context: IMatchContext | null = null;
+  private _handler: IMatchHandler | null = null;
   private _brackets: BracketDefinition[] = [];
 
   private clock: ClockService | null = null;
@@ -52,13 +56,17 @@ export class MultiplayerService
     return this._brackets;
   }
 
-  init(clock: ClockService) {
+  init = (clock: ClockService) => {
     this.clock = clock;
-  }
+  };
 
-  onMatchData(match: MatchData): void {
-    this._context.onMatchData(match.op_code, match.data);
-  }
+  onData = (opCode: number, data: Uint8Array): void => {
+    if (this._context) {
+      this._context.onMatchData(opCode, data);
+    } else {
+      logger.warn("Received '@OpCode' with no context to handle it.", opCode);
+    }
+  };
 
   async refreshBrackets(): Promise<void> {
     const res = await this.rpc.call<GetBracketsResponse>(

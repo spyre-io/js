@@ -1,45 +1,8 @@
-import {IRpcService} from "../net/interfaces";
-import {AsyncOp} from "../shared/types";
-import {asyncOps} from "../util/async";
+import {IRpcService} from "@/core/net/interfaces";
+import {AsyncOp} from "@/core/shared/types";
+import {asyncOps} from "@/core/util/async";
+import {IVaultService} from "./interfaces";
 import {CollectVaultResponse, GetVaultsResponse, TimedVault} from "./types.gen";
-
-export interface IVaultService {
-  /**
-   * The current loading status of the vaults.
-   */
-  get status(): AsyncOp;
-
-  /**
-   * All loaded vaults.
-   */
-  get vaults(): TimedVault[];
-
-  /**
-   * Refresh all vaults.
-   */
-  refresh(): Promise<void>;
-
-  /**
-   * True if and only if the vault is at capacity.
-   *
-   * @param vault The vault to check.
-   */
-  isFull(vault: TimedVault): boolean;
-
-  /**
-   * Calculates the current value of the vault.
-   *
-   * @param vault The vault to check.
-   */
-  getValue(vault: TimedVault): number;
-
-  /**
-   * Collects the vault.
-   *
-   * @param vault The vault to collect.
-   */
-  collect(vault: TimedVault): Promise<void>;
-}
 
 export class VaultService implements IVaultService {
   _status: AsyncOp = asyncOps.new();

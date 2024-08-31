@@ -1,27 +1,28 @@
-import {AccountService, IAccountService} from "@/core/account/service";
+import {AccountService} from "@/core/account/service";
 import {MultiplayerService} from "@/core/multiplayer/service";
 import {ConnectionService} from "@/core/net/service";
 import {IConnectionService, IRpcService} from "@/core/net/interfaces";
-import {
-  INotificationService,
-  NotificationService,
-} from "@/core/notifications/service";
-import {IWeb3Service, ThirdWebWeb3Service} from "@/core/web3/service";
+import {NotificationService} from "@/core/notifications/service";
+import {ThirdWebWeb3Service} from "@/core/web3/service";
 
-import {
-  ILeaderboardService,
-  LeaderboardService,
-} from "@/core/leaderboards/service";
+import {LeaderboardService} from "@/core/leaderboards/service";
 import {ThirdwebClient} from "thirdweb";
 import {ConnectionManager} from "thirdweb/wallets";
 import {Dispatcher} from "@/core/shared/dispatcher";
-import {HistoryService, IHistoryService} from "@/core/history/service";
-import {IVaultService, VaultService} from "./vault/service";
-import {ClockService, IClockService} from "./clock/service";
+import {HistoryService} from "@/core/history/service";
+import {VaultService} from "./vault/service";
+import {ClockService} from "./clock/service";
 import {IMultiplayerService} from "./multiplayer/interfaces";
 import {ISpyreClient} from "./interfaces";
 import {getDeviceId} from "./util";
 import {CreateSpyreClientOptions} from "./types";
+import {IAccountService} from "./account/interfaces";
+import {IWeb3Service} from "./web3/interfaces";
+import {ILeaderboardService} from "./leaderboards/interfaces";
+import {IClockService} from "./clock/interfaces";
+import {IHistoryService} from "./history/interfaces";
+import {INotificationService} from "./notifications/interfaces";
+import {IVaultService} from "./vault/interfaces";
 
 class SpyreClient implements ISpyreClient {
   constructor(

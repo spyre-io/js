@@ -1,23 +1,20 @@
 import {Client, Match, MatchData, Session, Socket} from "@heroiclabs/nakama-js";
 import {getBackoffMs, waitMs} from "@/core/util/net";
-import {childLogger, logger} from "@/core/util/logger";
+import {childLogger} from "@/core/util/logger";
 import {v4} from "uuid";
 import {ApiRpc} from "@heroiclabs/nakama-js/dist/api.gen";
 import {CancelToken, Kv, newCancelToken, SpyreError} from "@/core/shared/types";
-import {INotificationService} from "@/core/notifications/service";
+import {INotificationService} from "@/core/notifications/interfaces";
 import {
   IConnectionService,
+  IMatchDataHandler,
   INakamaClientService,
   IRpcService,
 } from "./interfaces";
 import {AsyncClientFn} from "./types";
-import {SpyreErrorCode} from "../shared/errors";
+import {SpyreErrorCode} from "@/core/shared/errors";
 
-const log = childLogger("connection");
-
-export interface IMatchDataHandler {
-  onMatchData(match: MatchData): void;
-}
+const logger = childLogger("becky:connection");
 
 export class ConnectionService
   implements IConnectionService, IRpcService, INakamaClientService
@@ -66,11 +63,21 @@ export class ConnectionService
     );
   }
 
-  setMatchDataHandler(handler: IMatchDataHandler): void {
+  setMatchDataHandler(handler: IMatchDataHandler | null): void {
     this._matchDataHandler = handler;
 
-    if (this._matchDataHandler && this._socket) {
-      this._socket.onmatchdata = this._matchDataHandler.onMatchData;
+    if (this._socket) {
+      if (handler) {
+        this._socket.onmatchdata = ({op_code, data}: MatchData) =>
+          handler.onData(op_code, data);
+      } else {
+        this._socket.onmatchdata = ({op_code, data}: MatchData) =>
+          logger.warn(
+            "Unhandled match data! @OpCode -> @Payload",
+            op_code,
+            new TextDecoder().decode(data),
+          );
+      }
     }
   }
 
@@ -137,14 +144,14 @@ export class ConnectionService
     if (!req) {
       const uuid = v4();
 
-      log.debug("Rpc start [@Uuid] --> @RPC", uuid, id);
+      logger.debug("Rpc start [@Uuid] --> @RPC", uuid, id);
 
       req = this._requestCache[key] = this.rpcWithRetry(id, payload)
         .then((res) => {
           // deletes the cache entry
           delete this._requestCache[key];
 
-          log.debug(
+          logger.debug(
             "Rpc end [@Uuid] <-- @RPC: @Response",
             uuid,
             id,
@@ -162,7 +169,7 @@ export class ConnectionService
           };
         })
         .catch((error) => {
-          log.debug("Rpc error [@Uuid] <-- @RPC: @Error", uuid, id, error);
+          logger.debug("Rpc error [@Uuid] <-- @RPC: @Error", uuid, id, error);
 
           // deletes the cache entry-- note that this cannot go in onFinally as
           // this would break retry logic
@@ -190,15 +197,13 @@ export class ConnectionService
     }
 
     // add handler first
-    if (this._matchDataHandler) {
-      this._socket.onmatchdata = this._matchDataHandler.onMatchData;
-    }
+    this.setMatchDataHandler(this._matchDataHandler);
 
     let match;
     try {
       match = await this._socket.joinMatch(matchId, "", meta);
     } catch (error) {
-      log.debug(`Failed joinMatch for unhandled reason: @Error`, error);
+      logger.debug(`Failed joinMatch for unhandled reason: @Error`, error);
 
       throw error;
     }
@@ -216,7 +221,7 @@ export class ConnectionService
       try {
         await this._socket!.leaveMatch(this._matchId);
       } catch (error) {
-        log.debug(`Failed leaveMatch for unhandled reason: @Error`, error);
+        logger.debug(`Failed leaveMatch for unhandled reason: @Error`, error);
       }
     }
 
@@ -241,7 +246,7 @@ export class ConnectionService
       await this.connect();
     }
 
-    log.debug(
+    logger.debug(
       "Sending match state @MatchId @OpCode @Payload",
       matchId,
       opCode,
@@ -253,7 +258,7 @@ export class ConnectionService
     } catch (error) {
       if (error === "Socket connection has not been established yet.") {
         // reconnect and retry
-        log.debug(
+        logger.debug(
           `Retrying failed sendMatchState (retry number @Retries) due to connection issue.`,
           retries,
         );
@@ -263,7 +268,10 @@ export class ConnectionService
 
         return await this.sendMatchState(matchId, opCode, payload, retries + 1);
       } else {
-        log.debug(`Failed sendMatchState for unhandled reason: @Error`, error);
+        logger.debug(
+          `Failed sendMatchState for unhandled reason: @Error`,
+          error,
+        );
 
         // unknown
         // TODO: SENTRY
@@ -284,7 +292,7 @@ export class ConnectionService
     } catch (error) {
       if (error === "Socket connection has not been established yet.") {
         // reconnect and retry
-        log.debug(
+        logger.debug(
           `Retrying failed API request (retry number @Retries) due to connection issue.`,
           retries,
         );
@@ -294,7 +302,7 @@ export class ConnectionService
 
         return await this.getApi(fn, retries + 1);
       } else {
-        log.debug(`Failed API request for unhandled reason: @Error`, error);
+        logger.debug(`Failed API request for unhandled reason: @Error`, error);
 
         // unknown
         //Sentry.captureException(error);
@@ -314,7 +322,7 @@ export class ConnectionService
     if (retries > 0) {
       const ms = getBackoffMs(retries);
 
-      log.info("Retrying connection in @Ms ms.", ms);
+      logger.info("Retrying connection in @Ms ms.", ms);
 
       await waitMs(ms);
     }
@@ -327,7 +335,7 @@ export class ConnectionService
     try {
       session = await this._client.authenticateDevice(this._deviceId!, true);
     } catch (error) {
-      log.info("Failed to authenticate: @Error", error);
+      logger.info("Failed to authenticate: @Error", error);
 
       return await this.connectWithRetries(cancelToken, retries + 1);
     }
@@ -340,7 +348,7 @@ export class ConnectionService
     try {
       await socket.connect(session, true);
     } catch (error) {
-      log.info("Failed to connect: @Error", error);
+      logger.info("Failed to connect: @Error", error);
 
       return await this.connectWithRetries(cancelToken, retries + 1);
     }
@@ -353,10 +361,7 @@ export class ConnectionService
 
     // set high -- though this doesn't appear to do anything
     socket.setHeartbeatTimeoutMs(30000);
-
-    if (this._matchDataHandler) {
-      socket.onmatchdata = this._matchDataHandler.onMatchData;
-    }
+    this.setMatchDataHandler(this._matchDataHandler);
 
     socket.onnotification = (message) => {
       this.notifs.on(message.code!, {
@@ -376,14 +381,14 @@ export class ConnectionService
 
     // check for active match
     if (this._matchId) {
-      log.debug("Rejoining match @MatchId.", this._matchId);
+      logger.debug("Rejoining match @MatchId.", this._matchId);
 
       try {
         await this._socket.joinMatch(this._matchId, "", this._matchMeta!);
       } catch (error) {
         if ((error as any).code === 4) {
           // this is a match not found error, which means the match is no longer active
-          log.debug(
+          logger.debug(
             "Failed joinMatch on connect() for match not found! Redirecting user to match results.",
           );
 
@@ -393,17 +398,17 @@ export class ConnectionService
           // TODO: WHAT DO WE DO HERE
           //window.location.href = `/results/${_matchId}`;
         } else {
-          log.debug(
+          logger.debug(
             `Failed joinMatch on connect() for unhandled reason, progressing to connected: @Error`,
             error,
           );
         }
       }
     } else {
-      log.debug("No active match to rejoin.");
+      logger.debug("No active match to rejoin.");
     }
 
-    log.info("Connected.");
+    logger.info("Connected.");
   }
 
   // Attempts to refresh the session. Returns true iff successful.
@@ -412,7 +417,7 @@ export class ConnectionService
     try {
       session = await this._client.sessionRefresh(this._session!);
     } catch (error) {
-      log.error("Failed to refresh session: @Error", error as object);
+      logger.error("Failed to refresh session: @Error", error as object);
 
       return false;
     }
@@ -439,7 +444,7 @@ export class ConnectionService
         // check expiry (five minutes before expiry)
         const now = Date.now();
         if (this._session.isexpired(now / 1000 + 600)) {
-          log.debug("Session is going to expire!");
+          logger.debug("Session is going to expire!");
 
           // Refresh the session. If it can't be refreshed, we need to
           // do a full disconnect/reconnect..
@@ -462,7 +467,7 @@ export class ConnectionService
             try {
               res = await this._socket.rpc("heartbeat/ping", "{}");
             } catch (error) {
-              log.debug("Heartbeat failed!");
+              logger.debug("Heartbeat failed!");
 
               if (cancelToken.cancelled) {
                 throw new Error("cancelled");
@@ -484,7 +489,7 @@ export class ConnectionService
               this._runtimeId = runtimeId;
             } else if (this._runtimeId !== runtimeId) {
               // full refresh
-              log.info("Runtime ID mismatch! Full refresh.");
+              logger.info("Runtime ID mismatch! Full refresh.");
 
               window.location.reload();
               return;
@@ -521,7 +526,7 @@ export class ConnectionService
         error === "The socket timed out while waiting for a response." ||
         (error as any).status === 401
       ) {
-        log.debug(
+        logger.debug(
           `Retrying failed RPC '@Rpc' (retry number @Retries) due to connection issue.`,
           id,
           retries,

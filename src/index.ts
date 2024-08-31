@@ -2,18 +2,18 @@
 
 // core/account
 export type {User} from "@/core/account/types";
-export type {IAccountService} from "@/core/account/service";
+export type {IAccountService} from "@/core/account/interfaces";
 
 // core/clock
-export type {IClockService} from "@/core/clock/service";
+export type {IClockService} from "@/core/clock/interfaces";
 
 // core/history
-export type {IHistoryService} from "@/core/history/service";
+export type {IHistoryService} from "@/core/history/interfaces";
 export type {HistorySearchCriteria} from "@/core/history/types";
 export type {HistoryItem, HistorySummaryItem} from "@/core/history/types.gen";
 
 // core/leaderboards
-export type {ILeaderboardService} from "@/core/leaderboards/service";
+export type {ILeaderboardService} from "@/core/leaderboards/interfaces";
 export type {LeaderboardEntry} from "@/core/leaderboards/types";
 
 // core/multiplayer
@@ -38,7 +38,7 @@ export {
 export type {IRpcService, IConnectionService} from "@/core/net/interfaces";
 
 // core/notifications
-export type {INotificationService} from "@/core/notifications/service";
+export type {INotificationService} from "@/core/notifications/interfaces";
 export type {Notification, NotificationCodes} from "@/core/notifications/types";
 
 // core/shared
@@ -61,7 +61,7 @@ export {getBackoffMs, waitMs} from "@/core/util/net";
 
 // core/web3
 export {fromWei, toWei} from "@/core/web3/helpers";
-export type {IWeb3Service} from "@/core/web3/service";
+export type {IWeb3Service} from "@/core/web3/interfaces";
 export type {
   Web3Address,
   Web3ConnectionStatus,

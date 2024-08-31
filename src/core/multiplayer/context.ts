@@ -1,10 +1,12 @@
 import {Match} from "@heroiclabs/nakama-js";
 import {IConnectionService} from "@/core/net/interfaces";
-import {logger} from "../util/logger";
-import {Dispatcher} from "../shared/dispatcher";
-import {ClockService} from "../clock/service";
+import {Dispatcher} from "@/core/shared/dispatcher";
+import {ClockService} from "@/core/clock/service";
 import {OpCodeInitClock} from "./types";
 import {IMatchContext} from "./interfaces";
+import {childLogger} from "@/core/util/logger";
+
+const logger = childLogger("becky:match-context");
 
 export class MatchContext implements IMatchContext {
   private readonly _dispatcher: Dispatcher<Uint8Array> = new Dispatcher();
@@ -34,6 +36,8 @@ export class MatchContext implements IMatchContext {
   }
 
   onMatchData(opCode: number, payload: Uint8Array): void {
+    logger.debug("onMatchData(@OpCode)", opCode);
+
     this._dispatcher.on(opCode, payload);
   }
 
@@ -49,32 +53,5 @@ export class MatchContext implements IMatchContext {
 
   quit(): void {
     //
-  }
-}
-
-export class NullMatchContext implements IMatchContext {
-  get matchId(): string {
-    return "";
-  }
-
-  addHandler<T>(opCode: number, handler: (payload: T) => void): () => void {
-    logger.debug(
-      `NullMatchContext.addHandler(@opCode, @handler)`,
-      opCode,
-      handler,
-    );
-    return () => {};
-  }
-
-  onMatchData(opCode: number, payload: any): void {
-    //
-  }
-
-  send(opCode: number, payload: any): void {
-    logger.debug(`NullMatchContext.send(@opCode, @payload)`, opCode, payload);
-  }
-
-  quit(): void {
-    logger.debug(`NullMatchContext.quit()`);
   }
 }

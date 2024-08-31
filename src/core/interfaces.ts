@@ -1,14 +1,14 @@
-import {IAccountService} from "@/core/account/service";
+import {IAccountService} from "@/core/account/interfaces";
 import {IConnectionService, IRpcService} from "@/core/net/interfaces";
-import {INotificationService} from "@/core/notifications/service";
-import {IWeb3Service} from "@/core/web3/service";
+import {INotificationService} from "@/core/notifications/interfaces";
+import {IWeb3Service} from "@/core/web3/interfaces";
 
-import {ILeaderboardService} from "@/core/leaderboards/service";
-import {IHistoryService} from "@/core/history/service";
-import {IVaultService} from "./vault/service";
-import {IClockService} from "./clock/service";
-import {IMultiplayerService} from "./multiplayer/interfaces";
-import {LogConfig} from "./types";
+import {ILeaderboardService} from "@/core/leaderboards/interfaces";
+import {IHistoryService} from "@/core/history/interfaces";
+import {IVaultService} from "@/core/vault/interfaces";
+import {IClockService} from "@/core/clock/interfaces";
+import {IMultiplayerService} from "@/core/multiplayer/interfaces";
+import {LogConfig} from "@/core/types";
 
 /**
  * The main client object that provides access to all Spyre services.

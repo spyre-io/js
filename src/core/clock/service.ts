@@ -2,13 +2,7 @@ import {IMultiplayerService} from "../multiplayer/interfaces";
 import {OpCodeInitClock} from "../multiplayer/types";
 import {AsyncOp, WatchedValue} from "../shared/types";
 import {asyncOps} from "../util/async";
-
-export interface IClockService {
-  sampling: WatchedValue<AsyncOp>;
-  offsetMillis: WatchedValue<number>;
-
-  update(): void;
-}
+import {IClockService} from "./interfaces";
 
 export class ClockService implements IClockService {
   private _sampling: WatchedValue<AsyncOp> = new WatchedValue<AsyncOp>(

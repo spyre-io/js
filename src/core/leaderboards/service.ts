@@ -1,9 +1,8 @@
-import {logger} from "@/core/util/logger";
+import {childLogger} from "../util/logger";
+import {ILeaderboardService} from "./interfaces";
 import {LeaderboardEntry} from "./types";
 
-export interface ILeaderboardService {
-  list(name: string, count: number): Promise<LeaderboardEntry[]>;
-}
+const logger = childLogger("becky:leaderboard");
 
 export class LeaderboardService implements ILeaderboardService {
   async list(name: string, count: number): Promise<LeaderboardEntry[]> {
