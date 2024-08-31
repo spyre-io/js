@@ -15,11 +15,13 @@ import {SpyreErrorCode} from "../shared/errors";
 
 const log = childLogger("connection");
 
+export interface IMatchDataHandler {
+  onMatchData(match: MatchData): void;
+}
+
 export class ConnectionService
   implements IConnectionService, IRpcService, INakamaClientService
 {
-  private readonly devNull: (message: MatchData) => void = () => {};
-
   // set on construction
   _isSecure: boolean;
   _client: Client;
@@ -43,7 +45,7 @@ export class ConnectionService
   _matchMeta: object | null = null;
 
   // handles match data
-  _handler: (matchData: MatchData) => void;
+  _matchDataHandler: IMatchDataHandler | null = null;
 
   // used in rpcWithRetry to dedupe requests
   _requestCache: {[key: string]: Promise<any>} = {};
@@ -62,7 +64,14 @@ export class ConnectionService
       3000,
       false,
     );
-    this._handler = this.devNull;
+  }
+
+  setMatchDataHandler(handler: IMatchDataHandler): void {
+    this._matchDataHandler = handler;
+
+    if (this._matchDataHandler && this._socket) {
+      this._socket.onmatchdata = this._matchDataHandler.onMatchData;
+    }
   }
 
   init(deviceId: string): void {
@@ -172,28 +181,24 @@ export class ConnectionService
     matchId: string,
     meta: Kv<string>,
     retries: number,
-    handler: (opCode: number, payload: Uint8Array) => void,
   ): Promise<Match> {
     if (!this._socket) {
       await this.connect();
       await waitMs(getBackoffMs(retries));
 
-      return this.join(matchId, meta, retries + 1, handler);
+      return this.join(matchId, meta, retries + 1);
     }
 
     // add handler first
-    this._handler = (matchData: MatchData) =>
-      handler(matchData.op_code, matchData.data);
-    this._socket.onmatchdata = this._handler;
+    if (this._matchDataHandler) {
+      this._socket.onmatchdata = this._matchDataHandler.onMatchData;
+    }
 
     let match;
     try {
       match = await this._socket.joinMatch(matchId, "", meta);
     } catch (error) {
       log.debug(`Failed joinMatch for unhandled reason: @Error`, error);
-
-      this._handler = this.devNull;
-      this._socket.onmatchdata = this.devNull;
 
       throw error;
     }
@@ -213,17 +218,10 @@ export class ConnectionService
       } catch (error) {
         log.debug(`Failed leaveMatch for unhandled reason: @Error`, error);
       }
-
-      try {
-        this._socket!.onmatchdata = this.devNull;
-      } catch {
-        // socket was null, no worries
-      }
     }
 
     this._matchId = null;
     this._matchMeta = null;
-    this._handler = this.devNull;
   }
 
   // Sends a match state update. This should be used rather than the socket
@@ -356,7 +354,10 @@ export class ConnectionService
     // set high -- though this doesn't appear to do anything
     socket.setHeartbeatTimeoutMs(30000);
 
-    socket.onmatchdata = this.devNull;
+    if (this._matchDataHandler) {
+      socket.onmatchdata = this._matchDataHandler.onMatchData;
+    }
+
     socket.onnotification = (message) => {
       this.notifs.on(message.code!, {
         code: message.code!,

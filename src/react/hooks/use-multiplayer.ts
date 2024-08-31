@@ -2,7 +2,7 @@ import {useCallback, useSyncExternalStore} from "react";
 import {useClient} from "./use-client";
 import {useMutation, useQuery} from "@tanstack/react-query";
 import {MatchmakingAcceptSignals} from "@/core/multiplayer/types";
-import {IMatchHandlerFactory} from "@/core/multiplayer/handler";
+import {IMatchHandlerFactory} from "@/core/multiplayer/interfaces";
 
 export const useMpBrackets = () => {
   const mp = useClient().multiplayer;
@@ -89,4 +89,14 @@ export const useMpMatchId = () => {
   }, [mp]);
 
   return useSyncExternalStore(mp.match.watch, get);
+};
+
+export const useMpSend = () => {
+  const mp = useClient().multiplayer;
+
+  return useCallback(
+    (opCode: number, payload: string | Uint8Array, retries: number = 1) =>
+      mp.send(opCode, payload, retries),
+    [mp],
+  );
 };

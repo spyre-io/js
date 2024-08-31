@@ -17,12 +17,12 @@ export type {ILeaderboardService} from "@/core/leaderboards/service";
 export type {LeaderboardEntry} from "@/core/leaderboards/types";
 
 // core/multiplayer
-export type {IMultiplayerService} from "@/core/multiplayer/service";
 export type {
+  IMultiplayerService,
   IMatchHandler,
   IMatchHandlerFactory,
-} from "@/core/multiplayer/handler";
-export type {IMatchContext} from "@/core/multiplayer/context";
+  IMatchContext,
+} from "@/core/multiplayer/interfaces";
 export type {
   MatchmakingAcceptSignals,
   MatchmakingBracketInfo,
@@ -75,11 +75,8 @@ export type {
 
 // client
 export {createSpyreClient} from "@/core/client";
-export type {
-  ISpyreClient,
-  CreateSpyreClientOptions,
-  LogConfig,
-} from "@/core/client";
+export type {ISpyreClient} from "@/core/interfaces";
+export type {CreateSpyreClientOptions, LogConfig} from "@/core/types";
 
 ///////////////////////////////////////////////////////////////////////// react
 export {SpyreClientProvider, SpyreConnect} from "@/react/client-provider";

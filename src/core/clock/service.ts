@@ -1,6 +1,5 @@
-import {IMultiplayerService} from "../multiplayer/service";
+import {IMultiplayerService} from "../multiplayer/interfaces";
 import {OpCodeInitClock} from "../multiplayer/types";
-import {IConnectionService} from "../net/interfaces";
 import {AsyncOp, WatchedValue} from "../shared/types";
 import {asyncOps} from "../util/async";
 

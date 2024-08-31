@@ -7,61 +7,26 @@ import {
 import {MatchInfo, MatchmakingInfo} from "@/core/shared/types.gen";
 import {logger} from "@/core/util/logger";
 import {Kv, WatchedValue} from "@/core/shared/types";
-import {Match} from "@heroiclabs/nakama-js";
+import {Match, MatchData} from "@heroiclabs/nakama-js";
 import {IConnectionService, IRpcService} from "@/core/net/interfaces";
-import {IAccountService} from "@/core/account/service";
 import {IWeb3Service} from "@/core/web3/service";
 import {MatchmakingAcceptSignals, MatchmakingBracketInfo} from "./types";
-import {IMatchHandler, IMatchHandlerFactory, NullMatchHandler} from "./handler";
-import {IMatchContext, MatchContext, NullMatchContext} from "./context";
-import {ClockService, IClockService} from "../clock/service";
+import {NullMatchHandler} from "./handler";
+import {MatchContext, NullMatchContext} from "./context";
+import {ClockService} from "../clock/service";
 import {Signature} from "../web3/types";
+import {IMatchDataHandler} from "../net/service";
+import {
+  IMatchContext,
+  IMatchHandler,
+  IMatchHandlerFactory,
+  IMultiplayerService,
+} from "./interfaces";
+import {getMatchmakingBracketInfo} from "./util";
 
-export interface IMultiplayerService {
-  get brackets(): BracketDefinition[];
-
-  get matchmakingInfo(): WatchedValue<MatchmakingInfo | null>;
-  get matchJoinIds(): WatchedValue<string[]>;
-  get matchInfo(): WatchedValue<MatchInfo | null>;
-  get match(): WatchedValue<Match | null>;
-
-  refreshBrackets(): Promise<void>;
-
-  findMatches(bracketId: number): Promise<void>;
-  acceptAndJoin(
-    factory: IMatchHandlerFactory,
-    signals?: MatchmakingAcceptSignals,
-  ): Promise<void>;
-
-  rejoin(
-    matchId: string,
-    meta: Kv<string>,
-    factory: IMatchHandlerFactory,
-    signals: MatchmakingAcceptSignals,
-    retries?: number,
-  ): Promise<void>;
-  leave(): Promise<void>;
-  send(
-    opCode: number,
-    payload: string | Uint8Array,
-    retries?: number,
-  ): Promise<void>;
-}
-
-const getMatchmakingBracketInfo = (
-  info: MatchmakingInfo,
-): MatchmakingBracketInfo => {
-  const {nonce, expiry, amount, fee} = info;
-
-  return {
-    nonce,
-    expiry: parseInt(expiry),
-    amount: parseInt(amount),
-    fee: parseInt(fee),
-  };
-};
-
-export class MultiplayerService implements IMultiplayerService {
+export class MultiplayerService
+  implements IMultiplayerService, IMatchDataHandler
+{
   match: WatchedValue<Match | null> = new WatchedValue<Match | null>(null);
   matchInfo: WatchedValue<MatchInfo | null> =
     new WatchedValue<MatchInfo | null>(null);
@@ -77,7 +42,6 @@ export class MultiplayerService implements IMultiplayerService {
 
   constructor(
     private readonly rpc: IRpcService,
-    private readonly account: IAccountService,
     private readonly web3: IWeb3Service,
     private readonly connection: IConnectionService,
   ) {
@@ -90,6 +54,10 @@ export class MultiplayerService implements IMultiplayerService {
 
   init(clock: ClockService) {
     this.clock = clock;
+  }
+
+  onMatchData(match: MatchData): void {
+    this._context.onMatchData(match.op_code, match.data);
   }
 
   async refreshBrackets(): Promise<void> {
@@ -214,12 +182,7 @@ export class MultiplayerService implements IMultiplayerService {
     }
 
     this._handler = factory.instance();
-    const match = await this.connection.join(
-      matchId,
-      meta,
-      retries,
-      this._handleMessages,
-    );
+    const match = await this.connection.join(matchId, meta, retries);
 
     this.match.setValue(match);
 
@@ -229,10 +192,6 @@ export class MultiplayerService implements IMultiplayerService {
 
     this._context = new MatchContext(this.connection, this.clock!, match);
     this._handler.joined(this._context);
-  };
-
-  _handleMessages = (opCode: number, payload: Uint8Array): void => {
-    this._context.onMatchData(opCode, payload);
   };
 
   leave(): Promise<void> {

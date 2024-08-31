@@ -1,9 +1,5 @@
-import {ILogTarget} from "@/core/util/logger";
 import {AccountService, IAccountService} from "@/core/account/service";
-import {
-  IMultiplayerService,
-  MultiplayerService,
-} from "@/core/multiplayer/service";
+import {MultiplayerService} from "@/core/multiplayer/service";
 import {ConnectionService} from "@/core/net/service";
 import {IConnectionService, IRpcService} from "@/core/net/interfaces";
 import {
@@ -11,9 +7,7 @@ import {
   NotificationService,
 } from "@/core/notifications/service";
 import {IWeb3Service, ThirdWebWeb3Service} from "@/core/web3/service";
-import {Web3Config} from "@/core/web3/types";
 
-import {v4, validate} from "uuid";
 import {
   ILeaderboardService,
   LeaderboardService,
@@ -24,106 +18,10 @@ import {Dispatcher} from "@/core/shared/dispatcher";
 import {HistoryService, IHistoryService} from "@/core/history/service";
 import {IVaultService, VaultService} from "./vault/service";
 import {ClockService, IClockService} from "./clock/service";
-
-/**
- * Options for creating a new {@link ISpyreClient} instance.
- */
-export type CreateSpyreClientOptions = {
-  /**
-   * Web3 configuration.
-   */
-  web3: Web3Config;
-
-  /**
-   * Optional logging configuration.
-   */
-  logging?: LogConfig;
-};
-
-/**
- * Logging configuration.
- */
-export type LogConfig = {
-  /**
-   * Log targets may be specified, which will accept log messages from Spyre.
-   */
-  loggers: ILogTarget[];
-};
-
-/**
- * Retrieves the device ID from local storage. A device ID is a unique GUID that is stored in local storage. If one does not exist, a new one is generated.
- */
-export const getDeviceId = (): string => {
-  let id = localStorage.getItem("deviceId");
-  if (!id || !validate(id)) {
-    id = v4();
-    localStorage.setItem("deviceId", id);
-  }
-
-  return id;
-};
-
-/**
- * The main client object that provides access to all Spyre services.
- */
-export interface ISpyreClient {
-  /**
-   * Retrieves the {@link IAccountService} instance. This provides access to information about a user.
-   */
-  account: IAccountService;
-
-  /**
-   * Retrieves the {@link IHistoryService} instance. This provides an API for retrieving match history.
-   */
-  history: IHistoryService;
-
-  /**
-   * Retrieves the {@link ILeaderboardService} instance. This provides access to the leaderboard service, which allows you to retrieve and update leaderboard information.
-   */
-  leaderboards: ILeaderboardService;
-
-  /**
-   * Retrieves the {@link IMultiplayerService} instance. This provides access to multiplayer services, such as matchmaking and in-match communcation.
-   */
-  multiplayer: IMultiplayerService;
-
-  /**
-   * Retrieves the {@link IConnectionService} instance. This manages the socket connection to the Spyre servers. It automatically handles reconnections and disconnects.
-   */
-  connection: IConnectionService;
-
-  /**
-   * Retrieves the {@link INotificationService} instance. This listens to push events from Spyre servers.
-   */
-  notifications: INotificationService;
-
-  /**
-   * Retrieves the {@link IWeb3Service} instance. This provides an easy interface over Spyre's Game Wallet API, which connects off-chain account services with on-chain actions.
-   */
-  web3: IWeb3Service;
-
-  /**
-   * Retrieves the {@link IRpcService} instance. This provides access to the RPC service, which allows you to call functions on the server.
-   */
-  rpc: IRpcService;
-
-  /**
-   * Retrieves the {@link IVaultService} instance. This provides access to the vault service, which allows you to manage vaults.
-   */
-  vaults: IVaultService;
-
-  /**
-   * Retrieves the {@link IClockService} instance. This provides access to an accurate server time offset.
-   */
-  clock: IClockService;
-
-  /**
-   * Initializes the client. This should be called before using any other services.
-   *
-   * @param logConfig - Optional logging configuration.
-   */
-  initialize(logConfig?: LogConfig): Promise<void>;
-}
+import {IMultiplayerService} from "./multiplayer/interfaces";
+import {ISpyreClient} from "./interfaces";
+import {getDeviceId} from "./util";
+import {CreateSpyreClientOptions} from "./types";
 
 class SpyreClient implements ISpyreClient {
   constructor(
@@ -190,16 +88,12 @@ export function createSpyreClient(
     options.web3,
     thirdweb,
   );
-  const multiplayer = new MultiplayerService(
-    connection,
-    account,
-    web3,
-    connection,
-  );
+  const multiplayer = new MultiplayerService(connection, web3, connection);
   const clock = new ClockService(multiplayer);
 
-  // todo: fix circular dependency
+  // todo: fix circular dependencies
   multiplayer.init(clock);
+  connection.setMatchDataHandler(multiplayer);
 
   return new SpyreClient(
     account,

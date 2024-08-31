@@ -10,11 +10,9 @@ import {
 import {createThirdwebClient, ThirdwebClient} from "thirdweb";
 import {createContext, PropsWithChildren, useMemo, useRef} from "react";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
-import {
-  createSpyreClient,
-  CreateSpyreClientOptions,
-  ISpyreClient,
-} from "@/core/client";
+import {createSpyreClient} from "@/core/client";
+import {CreateSpyreClientOptions} from "@/core/types";
+import {ISpyreClient} from "@/core/interfaces";
 import {useClient} from "@/react/hooks/use-client";
 import {ThirdWebWeb3Service} from "@/core/web3/service";
 

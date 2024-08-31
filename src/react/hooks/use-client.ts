@@ -1,8 +1,6 @@
 import {useCallback, useContext, useMemo} from "react";
 import {SpyreClientCtx} from "../client-provider";
-import {getDeviceId} from "../../core/client";
-import {useNotifHandler} from "./use-notifications";
-import {NotificationCodes} from "@/core/notifications/types";
+import {getDeviceId} from "../../core/util";
 import {useQueryClient} from "@tanstack/react-query";
 
 /**
