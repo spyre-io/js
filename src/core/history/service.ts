@@ -1,13 +1,12 @@
 import {IRpcService} from "@/core/net/interfaces";
 import {SpyreErrorCode} from "@/core/shared/errors";
 import {SpyreError} from "@/core/shared/types";
-import {IHistoryService} from "./interfaces";
+import {HistorySearchResults, IHistoryService} from "./interfaces";
 import {HistorySearchCriteria} from "./types";
 import {
   GetHistoryListResponse,
   GetHistoryMatchResponse,
   HistoryItem,
-  HistorySummaryItem,
 } from "./types.gen";
 
 export class HistoryService implements IHistoryService {
@@ -19,7 +18,7 @@ export class HistoryService implements IHistoryService {
     criteria?: HistorySearchCriteria,
     cursor?: string,
     count?: number,
-  ): Promise<[string, HistorySummaryItem[]]> {
+  ): Promise<HistorySearchResults> {
     const response = await this._rpc.call<GetHistoryListResponse>(
       "hangman/history/list",
       {cursor, count, ...criteria},
@@ -29,7 +28,10 @@ export class HistoryService implements IHistoryService {
       throw new SpyreError(SpyreErrorCode.INTERNAL, response.error);
     }
 
-    return [response.nextCursor, response.matches];
+    return {
+      cursor: response.nextCursor,
+      matches: response.matches,
+    };
   }
 
   async get(matchId: string): Promise<HistoryItem> {

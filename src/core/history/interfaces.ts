@@ -18,7 +18,7 @@ export interface IHistoryService {
     criteria?: HistorySearchCriteria,
     cursor?: string,
     count?: number,
-  ): Promise<[string, HistorySummaryItem[]]>;
+  ): Promise<HistorySearchResults>;
 
   /**
    * Retrieves a specific match by its ID.
@@ -29,3 +29,8 @@ export interface IHistoryService {
    */
   get(matchId: string): Promise<HistoryItem>;
 }
+
+export type HistorySearchResults = {
+  cursor: string;
+  matches: HistorySummaryItem[];
+};
