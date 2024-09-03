@@ -94,9 +94,6 @@ export class ConnectionService
     }
 
     this._deviceId = deviceId;
-
-    // kick-off heartbeat
-    this.heartbeat(newCancelToken());
   }
 
   // Connects to the server. This is safe to call at any time, as it will
@@ -287,6 +284,14 @@ export class ConnectionService
       throw new Error("Too many retries.");
     }
 
+    if (!this._session) {
+      try {
+        await this.connect();
+      } catch {
+        return await this.getApi(fn, retries + 1);
+      }
+    }
+
     try {
       return await fn(this._client, this._session!);
     } catch (error) {
@@ -378,6 +383,9 @@ export class ConnectionService
     // save connection objects
     this._socket = socket;
     this._session = session;
+
+    // kick-off heartbeat
+    this.heartbeat(newCancelToken());
 
     // check for active match
     if (this._matchId) {
