@@ -103,7 +103,7 @@ export class ThirdWebWeb3Service implements IWeb3Service {
       throw new Error("Missing usdc contract");
     }
 
-    this.network = config.chainId === 8432 ? base : baseSepolia;
+    this.network = config.chainId === 8453 ? base : baseSepolia;
 
     // load contracts
     this.stakingContract = getContract({
@@ -329,7 +329,6 @@ export class ThirdWebWeb3Service implements IWeb3Service {
     wad: bigint,
     cancel?: CancelToken,
   ): Promise<boolean> => {
-    logger.debug("requiresApproval(@wad, @cancel)", wad, cancel);
     throw new Error("Method not implemented.");
   };
 
