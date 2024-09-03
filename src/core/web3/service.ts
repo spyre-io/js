@@ -139,7 +139,7 @@ export class ThirdWebWeb3Service implements IWeb3Service {
           return;
         }
 
-        this.stakingBalance.value.setValue(result.value);
+        this.stakingBalance.value.setValue(result);
         this.stakingBalance.fetch.setValue(asyncOps.success());
       },
     };
@@ -163,7 +163,7 @@ export class ThirdWebWeb3Service implements IWeb3Service {
           return;
         }
 
-        this.usdcBalance.value.setValue(result.value);
+        this.usdcBalance.value.setValue(result);
         this.usdcBalance.fetch.setValue(asyncOps.success());
       },
     };

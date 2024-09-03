@@ -5,6 +5,9 @@ import {useCallback, useSyncExternalStore} from "react";
 import {Web3Address} from "@/core/web3/types";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {ThirdWebWeb3Service} from "@/core/web3/service";
+import {childLogger} from "@/core/util/logger";
+
+const logger = childLogger("becky:hooks:use-web3");
 
 // not exported in index
 export const useWeb3Thirdweb = () => {
@@ -92,7 +95,11 @@ export const useWeb3UsdcBalance = () => {
   const balance = web3.usdcBalance;
 
   const query = useCallback(async () => {
+    logger.debug("Refreshing balances.");
+
     await balance.refresh();
+
+    logger.debug("Balances refreshed: @Value", balance.value.getValue());
 
     return balance.value.getValue();
   }, [balance]);
