@@ -6,12 +6,15 @@ export const OpCodeInitNoop = 2;
 export type MatchmakingAcceptSignals = {
   onSignStart?: () => void;
   onSignComplete?: (signature: Signature) => void;
+  onSignError?: (error: Error) => void;
 
   onAcceptStart?: () => void;
   onAcceptComplete?: () => void;
+  onAcceptError?: (error: Error) => void;
 
   onJoinStart?: () => void;
   onJoinComplete?: () => void;
+  onJoinError?: (error: Error) => void;
 };
 
 export type MatchmakingBracketInfo = {

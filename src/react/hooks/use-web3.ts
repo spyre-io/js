@@ -2,7 +2,7 @@ import {useActiveWalletConnectionStatus} from "thirdweb/react";
 import {useAccount} from "./use-account";
 import {useClient} from "./use-client";
 import {useCallback, useSyncExternalStore} from "react";
-import {Web3Address} from "@/core/web3/types";
+import {SignStakeParameters, Web3Address} from "@/core/web3/types";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {ThirdWebWeb3Service} from "@/core/web3/service";
 import {childLogger} from "@/core/util/logger";
@@ -216,6 +216,21 @@ export const useWeb3Deposit = (wad: bigint) => {
 
     return txn;
   }, [web3, addr, wad]);
+
+  return useMutation({
+    mutationFn,
+  });
+};
+
+export const useWeb3Sign = () => {
+  const web3 = useClient().web3;
+
+  const mutationFn = useCallback(
+    async (signParams: SignStakeParameters) => {
+      return await web3.signStake(signParams);
+    },
+    [web3],
+  );
 
   return useMutation({
     mutationFn,

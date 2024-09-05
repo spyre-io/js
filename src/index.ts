@@ -69,6 +69,7 @@ export type {
   ContractConfig,
   Signature,
   SignStakeParameters,
+  SigningErrorType,
   TxnStatus,
   Txn,
 } from "@/core/web3/types";
@@ -144,6 +145,7 @@ export {
   useWeb3RequiresApproval,
   useWeb3Approve,
   useWeb3Deposit,
+  useWeb3Sign,
   useWeb3IsInAppWallet,
   useWeb3Link,
 } from "@/react/hooks/use-web3";

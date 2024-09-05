@@ -574,26 +574,16 @@ export class ThirdWebWeb3Service implements IWeb3Service {
       });
     } catch (error) {
       if ((error as any).code === 4001) {
-        // TODO: MIXPANEL
-
         // user canceled -- do nothing
         throw new SigniningError(SigningErrorType.USER_CANCELED);
       }
 
       if ((error as any).code === -32603) {
-        // TODO: MIXPANEL
-        //mixpanel.track("stake/sign/error", { nonce, });
-
         // TODO: wrong chain
         //switchChain(network);
 
         throw new SigniningError(SigningErrorType.WRONG_CHAIN);
       }
-
-      // TODO: MIXPANEL
-      // TODO: SENTRY
-      //mixpanel.track("stake/sign/error", { nonce, });
-      //Sentry.captureException(error);
 
       throw new SigniningError(
         SigningErrorType.UNKNOWN,

@@ -114,8 +114,15 @@ export class MultiplayerService
     factory: IMatchHandlerFactory,
     signals: MatchmakingAcceptSignals = {},
   ): Promise<void> {
-    const {onSignStart, onSignComplete, onAcceptStart, onAcceptComplete} =
-      signals;
+    const {
+      onSignStart,
+      onSignComplete,
+      onSignError,
+      onAcceptStart,
+      onAcceptComplete,
+      onAcceptError,
+      onJoinError,
+    } = signals;
 
     const matchmakingInfo = this.matchmakingInfo.getValue();
     if (!matchmakingInfo) {
@@ -131,12 +138,21 @@ export class MultiplayerService
       if (onSignStart) {
         onSignStart();
       }
-      sig = await this.web3.signStake({
-        nonce,
-        expiry,
-        amount,
-        fee,
-      });
+      try {
+        sig = await this.web3.signStake({
+          nonce,
+          expiry,
+          amount,
+          fee,
+        });
+      } catch (error) {
+        if (onSignError) {
+          onSignError(error as Error);
+        }
+
+        throw error;
+      }
+
       if (onSignComplete) {
         onSignComplete(sig);
       }
@@ -146,15 +162,29 @@ export class MultiplayerService
     if (onAcceptStart) {
       onAcceptStart();
     }
-    const res = await this.rpc.call<MatchmakingAcceptResponse>(
-      "hangman/matchmaking/accept",
-      {
-        mmId: matchmakingInfo.mmId,
-        signature: sig,
-      },
-    );
+
+    let res;
+    try {
+      res = await this.rpc.call<MatchmakingAcceptResponse>(
+        "hangman/matchmaking/accept",
+        {
+          mmId: matchmakingInfo.mmId,
+          signature: sig,
+        },
+      );
+    } catch (error) {
+      if (onAcceptError) {
+        onAcceptError(error as Error);
+      }
+
+      throw error;
+    }
 
     if (!res.success) {
+      if (onAcceptError) {
+        onAcceptError(new Error(res.error));
+      }
+
       throw new Error("Failed to accept match");
     }
 
@@ -175,6 +205,10 @@ export class MultiplayerService
     }
 
     if (!this.match.getValue()) {
+      if (onJoinError) {
+        onJoinError(new Error("Failed to join match"));
+      }
+
       throw new Error("Failed to join match");
     }
   }
