@@ -552,8 +552,8 @@ export class ThirdWebWeb3Service implements IWeb3Service {
     const domain = getStakingDomain({
       chainId: this.network.id,
       contractAddr: this.config.contracts["staking"].addr,
-      name: this.config.name,
-      version: "2",
+      name: "gamestaking",
+      //version: "2", <-- ?
     });
     const types = {Stake: getStakingTypes()};
     const stake = {
@@ -563,6 +563,13 @@ export class ThirdWebWeb3Service implements IWeb3Service {
       amount,
       fee,
     };
+
+    logger.debug(
+      "Signing: @Domain, @Types, @Stake",
+      JSON.stringify(domain, null, 2),
+      JSON.stringify(types, null, 2),
+      JSON.stringify(stake, null, 2),
+    );
 
     let result;
     try {
