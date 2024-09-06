@@ -71,8 +71,8 @@ export function createSpyreClient(
 ): ISpyreClient {
   const events = new Dispatcher<any>();
   const notifications = new NotificationService();
-  const leaderboards = new LeaderboardService();
   const connection = new ConnectionService(notifications);
+  const leaderboards = new LeaderboardService(connection);
 
   // todo: fix circular dependency
   notifications.init(connection);

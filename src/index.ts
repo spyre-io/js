@@ -103,14 +103,22 @@ export {
 // react/hooks/clock
 export {useClockOffsetMillis} from "@/react/hooks/use-clock";
 
-// react/hooks/history
-export {useHistoryFind, useHistoryGet} from "@/react/hooks/use-history";
-
 // react/hooks/connection
 export {
   useConnectionService,
   useIsConnected,
 } from "@/react/hooks/use-connection";
+
+// react/hooks/history
+export {useHistoryFind, useHistoryGet} from "@/react/hooks/use-history";
+
+// react/hooks/leaderboard
+export {
+  useLb,
+  useLbDaily,
+  useLbWeekly,
+  useLbAll,
+} from "@/react/hooks/use-leaderboards";
 
 // react/hooks/multiplayer
 export {
