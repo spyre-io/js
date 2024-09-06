@@ -24,7 +24,10 @@ const format = (
     if (index === -1) {
       uniqueTokens.push(tokenName);
 
-      meta[tokenName] = replacements[uniqueTokens.length - 1].toString();
+      const index = uniqueTokens.length - 1;
+      if (replacements && replacements.length > index && replacements[index]) {
+        meta[tokenName] = replacements[index].toString();
+      }
     }
   }
 

@@ -353,7 +353,7 @@ export class ConnectionService
     try {
       await socket.connect(session, true);
     } catch (error) {
-      logger.info("Failed to connect: @Error", error);
+      logger.info("Failed to connect: @Error", (error as any).message);
 
       return await this.connectWithRetries(cancelToken, retries + 1);
     }
