@@ -134,6 +134,9 @@ export {
 // react/hooks/notifications
 export {useNotifHandler} from "@/react/hooks/use-notifications";
 
+// react/hooks/rpc
+export {useRpcCall} from "@/react/hooks/use-rpc";
+
 // react/hooks/vault
 export {useVaultCollect, useVault} from "@/react/hooks/use-vaults";
 
