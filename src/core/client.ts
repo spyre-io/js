@@ -44,6 +44,7 @@ class SpyreClient implements ISpyreClient {
     this.connection.init(getDeviceId());
 
     await this.connection.connect();
+    await this.account.refresh();
   }
 }
 
