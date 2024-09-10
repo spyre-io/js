@@ -19,6 +19,21 @@ export const useMpBrackets = () => {
   });
 };
 
+export const useMpBracket = (id: number) => {
+  const mp = useClient().multiplayer;
+  const brackets = useMpBrackets();
+
+  const fn = useCallback(async () => {
+    return brackets.data?.find((b) => b.id === id);
+  }, [mp, brackets]);
+
+  return useQuery({
+    queryKey: ["brackets", id],
+    queryFn: fn,
+    enabled: brackets.isSuccess,
+  });
+};
+
 export const useMpMatchmakingFind = (bracketId: number) => {
   const mp = useClient().multiplayer;
 
@@ -83,6 +98,15 @@ export const useMpMatchId = () => {
   }, [mp]);
 
   return useSyncExternalStore(mp.match.watch, get);
+};
+
+export const useMpMatchBracketDefId = () => {
+  const mp = useClient().multiplayer;
+
+  return useSyncExternalStore(
+    mp.matchBracketDefId.watch,
+    mp.matchBracketDefId.getValue,
+  );
 };
 
 export const useMpSend = () => {

@@ -31,10 +31,13 @@ const logger = childLogger("becky:multiplayer");
 export class MultiplayerService
   implements IMultiplayerService, IMatchDataHandler
 {
-  match: WatchedValue<Match | null> = new WatchedValue<Match | null>(null);
   matchmakingInfo: WatchedValue<MatchmakingInfo | null> =
     new WatchedValue<MatchmakingInfo | null>(null);
   matchJoinIds: WatchedValue<string[]> = new WatchedValue<string[]>([]);
+  match: WatchedValue<Match | null> = new WatchedValue<Match | null>(null);
+  matchBracketDefId: WatchedValue<number | null> = new WatchedValue<
+    number | null
+  >(null);
 
   private _context: IMatchContext | null = null;
   private _handler: IMatchHandler | null = null;
@@ -80,6 +83,7 @@ export class MultiplayerService
     this.matchmakingInfo.setValue(null);
     this.matchJoinIds.setValue([]);
     this.match.setValue(null);
+    this.matchBracketDefId.setValue(bracketId);
 
     const res = await this.rpc.call<MatchmakingResponse>(
       "hangman/matchmaking/find",
@@ -93,7 +97,7 @@ export class MultiplayerService
 
     // we might already be in a match!
     if (matchInfo) {
-      const {creatorMatchId, opponentMatchIds} = matchInfo;
+      const {creatorMatchId, opponentMatchIds, bracketDefId} = matchInfo;
 
       const ids = [];
       if (creatorMatchId && creatorMatchId.length > 0) {
@@ -105,6 +109,7 @@ export class MultiplayerService
       }
 
       this.matchJoinIds.setValue(ids);
+      this.matchBracketDefId.setValue(bracketDefId);
     }
 
     this.matchmakingInfo.setValue(matchmakingInfo);

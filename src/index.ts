@@ -123,11 +123,14 @@ export {
 // react/hooks/multiplayer
 export {
   useMpBrackets,
+  useMpBracket,
   useMpMatchmakingFind,
   useMpMatchmakingAcceptAndJoin,
   useMpMatchmakingInfo,
   useMpMatchmakingJoinIds,
   useMpMatchId,
+  useMpMatchBracketDefId,
+  useMpSend,
 } from "@/react/hooks/use-multiplayer";
 
 // react/hooks/notifications

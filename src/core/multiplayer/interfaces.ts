@@ -16,6 +16,7 @@ export interface IMultiplayerService {
   get matchmakingInfo(): WatchedValue<MatchmakingInfo | null>;
   get matchJoinIds(): WatchedValue<string[]>;
   get match(): WatchedValue<Match | null>;
+  get matchBracketDefId(): WatchedValue<number | null>;
 
   refreshBrackets(): Promise<void>;
 

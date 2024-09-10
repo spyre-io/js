@@ -13,4 +13,5 @@ export type MatchmakingInfo = {
 export type MatchInfo = {
   creatorMatchId: string;
   opponentMatchIds: string[];
+  bracketDefId: number;
 };
