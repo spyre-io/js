@@ -1,5 +1,5 @@
 import {BracketDefinition} from "./types.gen";
-import {MatchInfo, MatchmakingInfo} from "@/core/shared/types.gen";
+import {MatchmakingInfo} from "@/core/shared/types.gen";
 import {Kv, WatchedValue} from "@/core/shared/types";
 import {Match} from "@heroiclabs/nakama-js";
 import {
@@ -15,7 +15,6 @@ export interface IMultiplayerService {
 
   get matchmakingInfo(): WatchedValue<MatchmakingInfo | null>;
   get matchJoinIds(): WatchedValue<string[]>;
-  get matchInfo(): WatchedValue<MatchInfo | null>;
   get match(): WatchedValue<Match | null>;
 
   refreshBrackets(): Promise<void>;

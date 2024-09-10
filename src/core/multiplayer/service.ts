@@ -4,7 +4,7 @@ import {
   MatchmakingAcceptResponse,
   MatchmakingResponse,
 } from "./types.gen";
-import {MatchInfo, MatchmakingInfo} from "@/core/shared/types.gen";
+import {MatchmakingInfo} from "@/core/shared/types.gen";
 import {Kv, WatchedValue} from "@/core/shared/types";
 import {Match} from "@heroiclabs/nakama-js";
 import {
@@ -32,8 +32,6 @@ export class MultiplayerService
   implements IMultiplayerService, IMatchDataHandler
 {
   match: WatchedValue<Match | null> = new WatchedValue<Match | null>(null);
-  matchInfo: WatchedValue<MatchInfo | null> =
-    new WatchedValue<MatchInfo | null>(null);
   matchmakingInfo: WatchedValue<MatchmakingInfo | null> =
     new WatchedValue<MatchmakingInfo | null>(null);
   matchJoinIds: WatchedValue<string[]> = new WatchedValue<string[]>([]);
@@ -81,7 +79,6 @@ export class MultiplayerService
   async findMatches(bracketId: number): Promise<void> {
     this.matchmakingInfo.setValue(null);
     this.matchJoinIds.setValue([]);
-    this.matchInfo.setValue(null);
     this.match.setValue(null);
 
     const res = await this.rpc.call<MatchmakingResponse>(
@@ -94,20 +91,23 @@ export class MultiplayerService
 
     const {matchmakingInfo, matchInfo} = res;
 
-    // we might already be in a match
-    const {creatorMatchId, opponentMatchIds} = matchInfo;
+    // we might already be in a match!
+    if (matchInfo) {
+      const {creatorMatchId, opponentMatchIds} = matchInfo;
 
-    const ids = [];
-    if (creatorMatchId && creatorMatchId.length > 0) {
-      ids.push(creatorMatchId);
+      const ids = [];
+      if (creatorMatchId && creatorMatchId.length > 0) {
+        ids.push(creatorMatchId);
+      }
+
+      if (opponentMatchIds && opponentMatchIds.length > 0) {
+        ids.push(...opponentMatchIds);
+      }
+
+      this.matchJoinIds.setValue(ids);
     }
 
-    if (opponentMatchIds && opponentMatchIds.length > 0) {
-      ids.push(...opponentMatchIds);
-    }
-    this.matchJoinIds.setValue(ids);
     this.matchmakingInfo.setValue(matchmakingInfo);
-    this.matchInfo.setValue(matchInfo);
   }
 
   async acceptAndJoin(
@@ -129,72 +129,81 @@ export class MultiplayerService
       throw new Error("No matchmaking info");
     }
 
-    let sig: Signature | undefined = undefined;
-    if (matchmakingInfo.onChain) {
-      const {nonce, expiry, amount, fee} =
-        getMatchmakingBracketInfo(matchmakingInfo);
+    // if we do not have any match join ids, we need to accept
+    let matchJoinIds = this.matchJoinIds.getValue();
 
-      // first, sign the stake
-      if (onSignStart) {
-        onSignStart();
+    logger.info("Accept and join, ids: @MatchJoinIds", matchJoinIds.join(", "));
+
+    if (matchJoinIds.length === 0) {
+      let sig: Signature | undefined = undefined;
+      if (matchmakingInfo.onChain) {
+        const {nonce, expiry, amount, fee} =
+          getMatchmakingBracketInfo(matchmakingInfo);
+
+        // first, sign the stake
+        if (onSignStart) {
+          onSignStart();
+        }
+        try {
+          sig = await this.web3.signStake({
+            nonce,
+            expiry,
+            amount,
+            fee,
+          });
+        } catch (error) {
+          if (onSignError) {
+            onSignError(error as Error);
+          }
+
+          throw error;
+        }
+
+        if (onSignComplete) {
+          onSignComplete(sig);
+        }
       }
+
+      // submit to backend
+      if (onAcceptStart) {
+        onAcceptStart();
+      }
+
+      let res;
       try {
-        sig = await this.web3.signStake({
-          nonce,
-          expiry,
-          amount,
-          fee,
-        });
+        res = await this.rpc.call<MatchmakingAcceptResponse>(
+          "hangman/matchmaking/accept",
+          {
+            mmId: matchmakingInfo.mmId,
+            signature: sig,
+          },
+        );
       } catch (error) {
-        if (onSignError) {
-          onSignError(error as Error);
+        if (onAcceptError) {
+          onAcceptError(error as Error);
         }
 
         throw error;
       }
 
-      if (onSignComplete) {
-        onSignComplete(sig);
-      }
-    }
+      if (!res.success) {
+        if (onAcceptError) {
+          onAcceptError(new Error(res.error));
+        }
 
-    // submit to backend
-    if (onAcceptStart) {
-      onAcceptStart();
-    }
-
-    let res;
-    try {
-      res = await this.rpc.call<MatchmakingAcceptResponse>(
-        "hangman/matchmaking/accept",
-        {
-          mmId: matchmakingInfo.mmId,
-          signature: sig,
-        },
-      );
-    } catch (error) {
-      if (onAcceptError) {
-        onAcceptError(error as Error);
+        throw new Error("Failed to accept match");
       }
 
-      throw error;
-    }
+      this.matchJoinIds.setValue(res.matchJoinIds);
 
-    if (!res.success) {
-      if (onAcceptError) {
-        onAcceptError(new Error(res.error));
+      if (onAcceptComplete) {
+        onAcceptComplete();
       }
-
-      throw new Error("Failed to accept match");
-    }
-
-    if (onAcceptComplete) {
-      onAcceptComplete();
     }
 
     // iterate through match join ids and try to join one
-    this.matchJoinIds.setValue(res.matchJoinIds);
-    for (const id of res.matchJoinIds) {
+    matchJoinIds = this.matchJoinIds.getValue();
+    for (const id of matchJoinIds) {
       try {
         await this.rejoin(id, {mmId: matchmakingInfo.mmId}, factory, signals);
 

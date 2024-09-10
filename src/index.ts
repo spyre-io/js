@@ -128,7 +128,6 @@ export {
   useMpMatchmakingInfo,
   useMpMatchmakingJoinIds,
   useMpMatchId,
-  useMpMatchmakingMatchInfo,
 } from "@/react/hooks/use-multiplayer";
 
 // react/hooks/notifications

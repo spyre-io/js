@@ -69,12 +69,6 @@ export const useMpMatchmakingJoinIds = () => {
   return useSyncExternalStore(mp.matchJoinIds.watch, mp.matchJoinIds.getValue);
 };
 
-export const useMpMatchmakingMatchInfo = () => {
-  const mp = useClient().multiplayer;
-
-  return useSyncExternalStore(mp.matchInfo.watch, mp.matchInfo.getValue);
-};
-
 export const useMpMatchId = () => {
   const mp = useClient().multiplayer;
 
