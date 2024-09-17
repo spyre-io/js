@@ -63,13 +63,21 @@ export const useWeb3IsWalletConnectedAndLinked = () => {
 export const useWeb3ActiveAddress = (): Web3Address | null => {
   const address = useClient().web3.activeAddress;
 
-  return useSyncExternalStore(address.watch, address.getValue);
+  return useSyncExternalStore(
+    address.watch,
+    address.getValue,
+    address.getValue,
+  );
 };
 
 export const useWeb3LinkedAddress = (): Web3Address | null => {
   const address = useClient().web3.linkedAddress;
 
-  return useSyncExternalStore(address.watch, address.getValue);
+  return useSyncExternalStore(
+    address.watch,
+    address.getValue,
+    address.getValue,
+  );
 };
 
 export const useWeb3StakingBalance = () => {
@@ -133,6 +141,7 @@ export const useWeb3NeedsSwitchChain = (): boolean => {
   return useSyncExternalStore(
     web3.needsToSwitchChains.watch,
     web3.needsToSwitchChains.getValue,
+    web3.needsToSwitchChains.getValue,
   );
 };
 
@@ -141,6 +150,7 @@ export const useWeb3IsInAppWallet = (): boolean => {
 
   return useSyncExternalStore(
     web3.isInAppWallet.watch,
+    web3.isInAppWallet.getValue,
     web3.isInAppWallet.getValue,
   );
 };

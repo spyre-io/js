@@ -7,5 +7,6 @@ export const useClockOffsetMillis = () => {
   return useSyncExternalStore(
     client.clock.offsetMillis.watch,
     client.clock.offsetMillis.getValue,
+    client.clock.offsetMillis.getValue,
   );
 };

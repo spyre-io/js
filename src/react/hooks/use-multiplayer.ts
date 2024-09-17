@@ -75,13 +75,18 @@ export const useMpMatchmakingInfo = () => {
   return useSyncExternalStore(
     mp.matchmakingInfo.watch,
     mp.matchmakingInfo.getValue,
+    mp.matchmakingInfo.getValue,
   );
 };
 
 export const useMpMatchmakingJoinIds = () => {
   const mp = useClient().multiplayer;
 
-  return useSyncExternalStore(mp.matchJoinIds.watch, mp.matchJoinIds.getValue);
+  return useSyncExternalStore(
+    mp.matchJoinIds.watch,
+    mp.matchJoinIds.getValue,
+    mp.matchJoinIds.getValue,
+  );
 };
 
 export const useMpMatchId = () => {
@@ -97,7 +102,7 @@ export const useMpMatchId = () => {
     return match_id;
   }, [mp]);
 
-  return useSyncExternalStore(mp.match.watch, get);
+  return useSyncExternalStore(mp.match.watch, get, get);
 };
 
 export const useMpMatchBracketDefId = () => {
@@ -105,6 +110,7 @@ export const useMpMatchBracketDefId = () => {
 
   return useSyncExternalStore(
     mp.matchBracketDefId.watch,
+    mp.matchBracketDefId.getValue,
     mp.matchBracketDefId.getValue,
   );
 };
