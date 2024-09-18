@@ -14,7 +14,7 @@ const format = (
   message: string,
   ...replacements: object[]
 ) => {
-  const meta: Kv<string> = {};
+  const meta: Kv<any> = {};
   const uniqueTokens: string[] = [];
 
   let results;
@@ -26,14 +26,29 @@ const format = (
 
       const index = uniqueTokens.length - 1;
       if (replacements && replacements.length > index && replacements[index]) {
-        meta[tokenName] = replacements[index].toString();
+        meta[tokenName] = replacements[index];
       }
     }
   }
 
   // replace
   for (const [key, value] of Object.entries(meta)) {
-    message = message.replaceAll(`@${key}`, value);
+    let stringValue;
+    if (!value) {
+      stringValue = "null";
+    } else if (typeof value === "string") {
+      stringValue = value;
+    } else if (typeof value === "object") {
+      stringValue = JSON.stringify(value);
+    } else if (typeof value === "function") {
+      stringValue = `${(value as Function).name}()` || "anonymous()";
+    } else if (typeof value === "bigint") {
+      stringValue = `BigInt(${(value as bigint).toString()})`;
+    } else {
+      stringValue = (value as any).toString();
+    }
+
+    message = message.replaceAll(`@${key}`, stringValue);
   }
 
   if (category) {

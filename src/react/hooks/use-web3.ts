@@ -1,4 +1,8 @@
-import {useActiveWalletConnectionStatus} from "thirdweb/react";
+import {
+  useActiveAccount,
+  useActiveWallet,
+  useActiveWalletConnectionStatus,
+} from "thirdweb/react";
 import {useAccount} from "./use-account";
 import {useClient} from "./use-client";
 import {useCallback, useSyncExternalStore} from "react";
@@ -113,7 +117,7 @@ export const useWeb3UsdcBalance = () => {
   }, [balance]);
 
   return useQuery({
-    queryKey: ["balance", "staking", addr],
+    queryKey: ["balance", "usdc", addr],
     queryFn: query,
   });
 };
