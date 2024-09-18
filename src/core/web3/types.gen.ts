@@ -1,4 +1,22 @@
+/////////////////////////////////////////////////////////////////////// core
+
+export type ChainChompTxn = {
+  id: number;
+  createdAt: number;
+  updatedAt: number;
+  method: string;
+  status: string;
+  txnHash: string;
+  error: string;
+};
+
 /////////////////////////////////////////////////////////////////////// network
+
+export type GetTxnRpcResponse = {
+  success: boolean;
+  error: string;
+  txn: ChainChompTxn;
+};
 
 export type GetNonceResponse = {
   nonce: string;

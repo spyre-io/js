@@ -2,7 +2,7 @@ import {useActiveWalletConnectionStatus} from "thirdweb/react";
 import {useAccount} from "./use-account";
 import {useClient} from "./use-client";
 import {useCallback, useSyncExternalStore} from "react";
-import {SignStakeParameters, Web3Address} from "@/core/web3/types";
+import {SignStakeParameters, Txn, Web3Address} from "@/core/web3/types";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {ThirdWebWeb3Service} from "@/core/web3/service";
 import {childLogger} from "@/core/util/logger";
@@ -186,49 +186,70 @@ export const useWeb3RequiresApproval = (wad: bigint) => {
   });
 };
 
-export const useWeb3Approve = (wad: bigint) => {
+export const useWeb3ApproveAndWatch = (ns: string) => {
   const web3 = useClient().web3;
   const addr = web3.linkedAddress.getValue();
   const queryClient = useQueryClient();
 
-  const mutationFn = useCallback(async () => {
-    const txn = await web3.approve(wad);
+  const mutationFn = useCallback(
+    async (wad: bigint) => {
+      const txn = await web3.approve(ns, wad);
 
-    // after txn resolves, invalidate the allowance
-    txn.onResolve(() =>
-      queryClient.invalidateQueries({
-        queryKey: ["allowance", addr],
-      }),
-    );
+      // after txn resolves, invalidate the allowance
+      txn.onResolve(() =>
+        queryClient.invalidateQueries({
+          queryKey: ["allowance", addr],
+        }),
+      );
 
-    return txn;
-  }, [web3, addr, wad]);
+      await web3.watch(txn);
+
+      return txn;
+    },
+    [web3, addr],
+  );
 
   return useMutation({
     mutationFn,
   });
 };
 
-export const useWeb3Deposit = (wad: bigint) => {
+export const useWeb3DepositAndWatch = (ns: string) => {
   const web3 = useClient().web3;
   const addr = web3.linkedAddress.getValue();
   const queryClient = useQueryClient();
 
-  const mutationFn = useCallback(async () => {
-    const txn = await web3.deposit(wad);
+  const mutationFn = useCallback(
+    async (wad: bigint) => {
+      const txn = await web3.deposit(ns, wad);
 
-    // after txn resolves, invalidate the balances
-    txn.onResolve(() =>
-      queryClient.invalidateQueries({
-        queryKey: ["balance"],
-      }),
-    );
+      // after txn resolves, invalidate the balances
+      txn.onResolve(() =>
+        queryClient.invalidateQueries({
+          queryKey: ["balance"],
+        }),
+      );
 
-    return txn;
-  }, [web3, addr, wad]);
+      await web3.watch(txn);
+
+      return txn;
+    },
+    [web3, addr],
+  );
 
   return useMutation({
     mutationFn,
+  });
+};
+
+export const useWeb3WatchTxn = () => {
+  const web3 = useClient().web3;
+
+  const fn = useCallback(async (txn: Txn) => await web3.watch(txn), [web3]);
+
+  return useMutation({
+    mutationFn: fn,
+    mutationKey: ["web3", "watch"],
   });
 };
 

@@ -44,6 +44,7 @@ import {
   DepositResponse,
   GetLinkChallengeResponse,
   GetNonceResponse,
+  GetTxnRpcResponse,
   PermitResponse,
 } from "./types.gen";
 import {Dispatcher} from "@/core/shared/dispatcher";
@@ -333,7 +334,52 @@ export class ThirdWebWeb3Service implements IWeb3Service {
     throw new Error("Method not implemented.");
   };
 
-  approve = async (wad?: bigint, cancel?: CancelToken): Promise<Txn> => {
+  watch = async (txn: Txn): Promise<void> => {
+    // TODO: very naive implementation, need a queue and batched requests
+    let retries = 3;
+
+    const promise = new Promise<void>((resolve, rej) => {
+      const intervalId = setInterval(async () => {
+        const res = await this._rpc.call<GetTxnRpcResponse>("web3/txn/get", {
+          txnId: txn.id,
+          ns: txn.ns,
+        });
+
+        if (res.success) {
+          if (res.txn.status === "success") {
+            clearInterval(intervalId);
+
+            // confirm
+            txn.confirm(res.txn.txnHash);
+
+            resolve();
+          } else if (res.txn.status === "failure") {
+            clearInterval(intervalId);
+
+            // fail
+            txn.fail(res.txn.error);
+
+            resolve();
+          }
+
+          // other statuses fall through
+        } else if (--retries === 0) {
+          logger.warn("Could not get txn: @Error.", res.error);
+
+          clearInterval(intervalId);
+          rej(new SpyreError(SpyreErrorCode.UNAVAILABLE, res.error));
+        }
+      }, 3000);
+    });
+
+    return promise;
+  };
+
+  approve = async (
+    namespace: string,
+    wad?: bigint,
+    cancel?: CancelToken,
+  ): Promise<Txn> => {
     const account = this._connectionManager.activeAccountStore.getValue();
     if (!account) {
       throw new SpyreError(
@@ -431,14 +477,14 @@ export class ThirdWebWeb3Service implements IWeb3Service {
       );
     }
 
-    const txn = new Txn(permitResult.txnId);
-
-    // todo: WATCH txn
-
-    return txn;
+    return new Txn(permitResult.txnId, namespace);
   };
 
-  deposit = async (wad: bigint, cancel?: CancelToken): Promise<Txn> => {
+  deposit = async (
+    namespace: string,
+    wad: bigint,
+    cancel?: CancelToken,
+  ): Promise<Txn> => {
     const account = this._connectionManager.activeAccountStore.getValue();
     if (!account) {
       throw new SpyreError(
@@ -474,7 +520,7 @@ export class ThirdWebWeb3Service implements IWeb3Service {
       user: this.linkedAddress.getValue(),
       nonce: bigIntToString(BigInt(nonce)),
       expiry: bigIntToString(BigInt(0)),
-      amount: bigIntToString(BigInt(wad + "000000")),
+      amount: bigIntToString(wad),
       fee: bigIntToString(BigInt(0)),
     };
 
@@ -521,11 +567,7 @@ export class ThirdWebWeb3Service implements IWeb3Service {
       );
     }
 
-    const txn = new Txn(depositResult.txnId);
-
-    // TODO: WATCH txn
-
-    return txn;
+    return new Txn(depositResult.txnId, namespace);
   };
 
   switchChain = async (): Promise<void> => {

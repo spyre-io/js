@@ -61,7 +61,11 @@ export class Txn {
   private _hash: string = "";
   private _error: string = "";
 
-  constructor(public readonly id: number) {
+  constructor(
+    public readonly id: number,
+    // todo: this is obviously not right
+    public readonly ns: string,
+  ) {
     this._status = TxnStatus.Sent;
   }
 

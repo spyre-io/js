@@ -94,16 +94,37 @@ export interface IWeb3Service {
   /**
    * Approves the staking contract to transfer USDC on the user's behalf.
    *
+   * The transaction object returned from this function represents a potentially in progress transaction. That is,
+   * this function returns after submission, not after confirmation. Use the watch function to watch the transaction
+   * for status changes.
+   *
+   * @param namespace - The namespace of the staking contract.
    * @param wad - The amount to approve.
    * @param cancel - An optional cancel token to cancel the operation.
    */
-  approve(wad?: bigint, cancel?: CancelToken): Promise<Txn>;
+  approve(namespace: string, wad?: bigint, cancel?: CancelToken): Promise<Txn>;
 
   /**
    * Deposits USDC into the staking contract.
    *
+   * The transaction object returned from this function represents a potentially in progress transaction. That is,
+   * this function returns after submission, not after confirmation. Use the watch function to watch the transaction
+   * for status changes.
+   *
+   * @param namespace - The namespace of the staking contract.
    * @param amount - The amount to deposit.
    * @param cancel - An optional cancel token to cancel the operation.
    */
-  deposit(amount: bigint, cancel?: CancelToken): Promise<Txn>;
+  deposit(
+    namespace: string,
+    amount: bigint,
+    cancel?: CancelToken,
+  ): Promise<Txn>;
+
+  /**
+   * Watches a transaction for status change.
+   *
+   * @param txn The transaction to watch.
+   */
+  watch(txn: Txn): Promise<void>;
 }
