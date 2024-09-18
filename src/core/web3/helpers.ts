@@ -139,3 +139,7 @@ export const toWei = (wad: bigint): bigint => {
 
   return BigInt(val) * weiMultiplier;
 };
+
+export const bigIntToString = (value: bigint): string => {
+  return `0x${value.toString(16)}`;
+};

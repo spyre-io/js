@@ -10,6 +10,7 @@ import {
 } from "./types";
 
 import {
+  bigIntToString,
   getDepositDomain,
   getDepositTypes,
   getPermitDomain,
@@ -374,14 +375,17 @@ export class ThirdWebWeb3Service implements IWeb3Service {
     const permit = {
       owner: this._linkedAddress.getValue(),
       spender: this.config.contracts.staking.addr,
-      value:
+      value: bigIntToString(
         wad ||
+          BigInt(
+            "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          ),
+      ),
+      nonce: bigIntToString(nonce),
+      deadline: bigIntToString(
         BigInt(
           "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
         ),
-      nonce,
-      deadline: BigInt(
-        "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
       ),
     };
 
@@ -468,10 +472,10 @@ export class ThirdWebWeb3Service implements IWeb3Service {
     const types = {Deposit: getDepositTypes()};
     const deposit = {
       user: this.linkedAddress.getValue(),
-      nonce: BigInt(nonce),
-      expiry: BigInt(0),
-      amount: BigInt(wad + "000000"),
-      fee: BigInt(0),
+      nonce: bigIntToString(BigInt(nonce)),
+      expiry: bigIntToString(BigInt(0)),
+      amount: bigIntToString(BigInt(wad + "000000")),
+      fee: bigIntToString(BigInt(0)),
     };
 
     let result;
