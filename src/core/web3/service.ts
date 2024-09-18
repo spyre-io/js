@@ -81,6 +81,7 @@ export class ThirdWebWeb3Service implements IWeb3Service {
 
   public readonly stakingBalance: WatchedAsyncValue<bigint>;
   public readonly usdcBalance: WatchedAsyncValue<bigint>;
+  public readonly usdcPermitAmount: WatchedAsyncValue<bigint>;
   public readonly withdrawAfter: WatchedAsyncValue<Date> = {
     value: new WatchedValue(new Date()),
     fetch: new WatchedValue(asyncOps.new()),
@@ -167,6 +168,33 @@ export class ThirdWebWeb3Service implements IWeb3Service {
 
         this.usdcBalance.value.setValue(result);
         this.usdcBalance.fetch.setValue(asyncOps.success());
+      },
+    };
+
+    this.usdcPermitAmount = {
+      value: new WatchedValue<bigint>(BigInt(0)),
+      fetch: new WatchedValue(asyncOps.new()),
+      refresh: async () => {
+        this.usdcPermitAmount.fetch.setValue(asyncOps.inProgress());
+
+        let result: ReadContractResult<any>;
+        try {
+          result = await readContract({
+            contract: this.usdcContract,
+            method: "allowance",
+            params: [
+              this._account.user?.walletAddr,
+              this.config.contracts.staking.addr,
+            ],
+          });
+        } catch (error) {
+          this.usdcPermitAmount.fetch.setValue(asyncOps.failure(error));
+
+          return;
+        }
+
+        this.usdcPermitAmount.value.setValue(result);
+        this.usdcPermitAmount.fetch.setValue(asyncOps.success());
       },
     };
 
@@ -325,13 +353,6 @@ export class ThirdWebWeb3Service implements IWeb3Service {
     this._events.on(Messages.ACCOUNT_WALLET_CONNECTED, {
       addr: submitRes.addr,
     });
-  };
-
-  requiresApproval = async (
-    wad: bigint,
-    cancel?: CancelToken,
-  ): Promise<boolean> => {
-    throw new Error("Method not implemented.");
   };
 
   watch = async (txn: Txn): Promise<void> => {

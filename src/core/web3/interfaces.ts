@@ -53,6 +53,11 @@ export interface IWeb3Service {
   get usdcBalance(): WatchedAsyncValue<bigint>;
 
   /**
+   * The amount of USDC the user has approved for the staking contract to spend on their behalf.
+   */
+  get usdcPermitAmount(): WatchedAsyncValue<bigint>;
+
+  /**
    * Given by the Spyre GameWallet contract, the date after which the user can withdraw their staked USDC.
    */
   get withdrawAfter(): WatchedAsyncValue<Date>;
@@ -82,14 +87,6 @@ export interface IWeb3Service {
     params: SignStakeParameters,
     cancel?: CancelToken,
   ): Promise<Signature>;
-
-  /**
-   * Checks if the user needs to approve a deposit. This is enforced by the USDC smart contract.
-   *
-   * @param wad - The amount to deposit.
-   * @param cancel - An optional cancel token to cancel the operation.
-   */
-  requiresApproval(wad: bigint, cancel?: CancelToken): Promise<boolean>;
 
   /**
    * Approves the staking contract to transfer USDC on the user's behalf.

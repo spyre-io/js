@@ -1,8 +1,4 @@
-import {
-  useActiveAccount,
-  useActiveWallet,
-  useActiveWalletConnectionStatus,
-} from "thirdweb/react";
+import {useActiveWalletConnectionStatus} from "thirdweb/react";
 import {useAccount} from "./use-account";
 import {useClient} from "./use-client";
 import {useCallback, useSyncExternalStore} from "react";
@@ -122,6 +118,27 @@ export const useWeb3UsdcBalance = () => {
   });
 };
 
+export const useWeb3UsdcPermitAmount = () => {
+  const web3 = useClient().web3;
+  const addr = web3.linkedAddress.getValue();
+  const amount = web3.usdcPermitAmount;
+
+  const query = useCallback(async () => {
+    logger.debug("Refreshing permit amount.");
+
+    await amount.refresh();
+
+    logger.debug("Permit amount refreshed: @Value", amount.value.getValue());
+
+    return amount.value.getValue();
+  }, [amount]);
+
+  return useQuery({
+    queryKey: ["web3", "usdc", "permit", addr],
+    queryFn: query,
+  });
+};
+
 export const useWeb3RefreshBalances = (): (() => Promise<void>) => {
   const web3 = useClient().web3;
   const queryClient = useQueryClient();
@@ -173,21 +190,6 @@ export const useWeb3SwitchChain = (): (() => Promise<void>) => {
   const web3 = useClient().web3;
 
   return web3.switchChain;
-};
-
-export const useWeb3RequiresApproval = (wad: bigint) => {
-  const web3 = useClient().web3;
-  const addr = web3.linkedAddress.getValue();
-
-  const query = useCallback(
-    async () => await web3.requiresApproval(wad),
-    [web3, wad],
-  );
-
-  return useQuery({
-    queryKey: ["allowance", addr],
-    queryFn: query,
-  });
 };
 
 export const useWeb3ApproveAndWatch = (ns: string) => {

@@ -155,7 +155,7 @@ export {
   useWeb3NeedsSwitchChain,
   useWeb3SwitchChain,
   useWeb3RefreshBalances,
-  useWeb3RequiresApproval,
+  useWeb3UsdcPermitAmount,
   useWeb3ApproveAndWatch,
   useWeb3DepositAndWatch,
   useWeb3Sign,
