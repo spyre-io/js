@@ -98,6 +98,7 @@ export {
   useAccount,
   useAccountRefresh,
   useAccountUpdate,
+  useAccountUpdateUsername,
 } from "@/react/hooks/use-account";
 
 // react/hooks/clock

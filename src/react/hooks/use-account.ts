@@ -51,15 +51,40 @@ export const useAccountRefresh = () => {
 
 /**
  * Returns a Tanstack [`useMutation`](https://tanstack.com/query/latest/docs/framework/react/guides/mutations) object for updating the current user's {@link User | Account} information.
- *
- * @param user - The {@link User | Account} object to update.
  */
-export const useAccountUpdate = (user: User) => {
+export const useAccountUpdate = () => {
   const client = useClient();
+  const queryClient = useQueryClient();
 
   const query = useCallback(
-    async () => await client.account.update(user),
-    [client, user],
+    async (user: User) => {
+      await client.account.update(user);
+      await queryClient.invalidateQueries({queryKey: ["account"]});
+    },
+    [client],
+  );
+
+  return useMutation({
+    mutationFn: query,
+  });
+};
+
+/**
+ * Returns a Tanstack [`useMutation`](https://tanstack.com/query/latest/docs/framework/react/guides/mutations) object for updating the current user's username.
+ *
+ */
+export const useAccountUpdateUsername = () => {
+  const client = useClient();
+  const queryClient = useQueryClient();
+
+  const query = useCallback(
+    async (username: string) => {
+      const current = client.account.user;
+
+      await client.account.update({...current, username});
+      await queryClient.invalidateQueries({queryKey: ["account"]});
+    },
+    [client],
   );
 
   return useMutation({

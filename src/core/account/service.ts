@@ -4,11 +4,8 @@ import {User} from "./types";
 import {asyncOps} from "@/core/util/async";
 import {Dispatcher} from "@/core/shared/dispatcher";
 import {Messages} from "@/core/shared/message";
-import {childLogger} from "@/core/util/logger";
 import {IAccountService} from "./interfaces";
 import {getUser} from "./util";
-
-const logger = childLogger("becky:account");
 
 export const NullUser: User = {
   walletAddr: null,
@@ -69,8 +66,13 @@ export class AccountService implements IAccountService {
   };
 
   update = async (user: User): Promise<void> => {
-    logger.debug("AccountService.update(@user)", {user});
-    throw new Error("Not implemented");
+    await this._nakama.getApi(async (client, session) => {
+      await client.updateAccount(session, {
+        avatar_url: user.avatarUrl,
+        display_name: user.displayName,
+        username: user.username,
+      });
+    }, 0);
   };
 
   onUpdate = (fn: (user: User) => void): (() => void) => {

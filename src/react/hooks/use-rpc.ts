@@ -14,5 +14,6 @@ export const useRpcCall = (id: string) => {
 
   return useMutation({
     mutationFn: fn,
+    mutationKey: [id],
   });
 };
