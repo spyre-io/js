@@ -58,12 +58,6 @@ export function WalletConnection({
             connectModal={{size: "compact"}}
             chain={network}
             appMetadata={web3Config.thirdweb.metadata}
-            detailsButton={{
-              displayBalanceToken: {
-                84532: web3Config.contracts.usdc.addr,
-                8453: web3Config.contracts.usdc.addr,
-              },
-            }}
             supportedTokens={{
               84532: [
                 {
