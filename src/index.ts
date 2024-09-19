@@ -8,7 +8,10 @@ export type {IAccountService} from "@/core/account/interfaces";
 export type {IClockService} from "@/core/clock/interfaces";
 
 // core/history
-export type {IHistoryService} from "@/core/history/interfaces";
+export type {
+  IHistoryService,
+  HistorySearchResults,
+} from "@/core/history/interfaces";
 export type {HistorySearchCriteria} from "@/core/history/types";
 export type {HistoryItem, HistorySummaryItem} from "@/core/history/types.gen";
 
@@ -26,13 +29,12 @@ export type {
 export type {
   MatchmakingAcceptSignals,
   MatchmakingBracketInfo,
-} from "@/core/multiplayer/types";
-export {
   MatchUserState,
   MatchStartEvent,
   MatchEndEvent,
   DisconnectReason,
 } from "@/core/multiplayer/types";
+export type {BracketDefinition} from "@/core/multiplayer/types.gen";
 
 // core/net
 export type {IRpcService, IConnectionService} from "@/core/net/interfaces";
@@ -52,12 +54,18 @@ export type {
   WatchedValue,
 } from "@/core/shared/types";
 
+export type {MatchmakingInfo} from "@/core/shared/types.gen";
+
 // core/util
 export {logger, childLogger, getHistory} from "@/core/util/logger";
 export type {ILogTarget} from "@/core/util/logger";
 export {runFor, waitFor} from "@/core/util/time";
 export {asyncOps, repeatAsync} from "@/core/util/async";
 export {getBackoffMs, waitMs} from "@/core/util/net";
+
+// core/vault
+export type {IVaultService} from "@/core/vault/interfaces";
+export type {TimedVault} from "@/core/vault/types.gen";
 
 // core/web3
 export {fromWei, toWei} from "@/core/web3/helpers";
