@@ -30,7 +30,7 @@ function Example() {
 }
 ```
 
-### Becky Development Quickstart
+### Development Quickstart
 
 ```
 pnpm install
