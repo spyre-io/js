@@ -1,11 +1,11 @@
-# Becky
+# Spyre JS SDK
 
 A typescript and react module for building games on Spyre. This library provides a simple interface for interaction between the `Thirdweb SDK`, `TanStack Query`, `Nakama SDK`, and Spyre-specific hooks for game wallet interaction.
 
 ### Quickstart
 
 ```ts
-import { SpyreClientProvider } from "@spyre-io/becky";
+import { SpyreClientProvider } from "@spyre-io/js";
 
 function Example() {
  return (
