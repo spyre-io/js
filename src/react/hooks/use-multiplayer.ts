@@ -29,6 +29,16 @@ export const useMpBrackets = () => {
   });
 };
 
+export const useMpBracketRefreshSecUTC = () => {
+  const mp = useClient().multiplayer;
+
+  return useSyncExternalStore(
+    mp.bracketRefreshSecUTC.watch,
+    mp.bracketRefreshSecUTC.getValue,
+    mp.bracketRefreshSecUTC.getValue,
+  );
+};
+
 export const useMpBracket = (id: number) => {
   const mp = useClient().multiplayer;
   const brackets = useMpBrackets();

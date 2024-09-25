@@ -132,6 +132,7 @@ export {
 // react/hooks/multiplayer
 export {
   useMpBrackets,
+  useMpBracketRefreshSecUTC,
   useMpBracket,
   useMpMatchmakingFind,
   useMpMatchmakingAcceptAndJoin,
