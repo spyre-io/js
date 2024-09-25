@@ -26,6 +26,7 @@ export const useMpBrackets = () => {
   return useQuery({
     queryKey: ["brackets"],
     queryFn: fn,
+    refetchOnWindowFocus: "always",
   });
 };
 
