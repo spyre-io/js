@@ -1,14 +1,24 @@
 import {useCallback, useSyncExternalStore} from "react";
 import {useClient} from "./use-client";
-import {useMutation, useQuery} from "@tanstack/react-query";
+import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {MatchmakingAcceptSignals} from "@/core/multiplayer/types";
 import {IMatchHandlerFactory} from "@/core/multiplayer/interfaces";
 
 export const useMpBrackets = () => {
+  const client = useQueryClient();
   const mp = useClient().multiplayer;
 
   const fn = useCallback(async () => {
     await mp.refreshBrackets();
+
+    const refreshSecUTC = mp.bracketRefreshSecUTC.getValue();
+    const currentSecUTC = Date.now() / 1000;
+
+    // set a timeout to invalidate
+    setTimeout(
+      () => client.invalidateQueries({queryKey: ["brackets"]}),
+      Math.max(1000, (refreshSecUTC - currentSecUTC) * 1000),
+    );
 
     return mp.brackets;
   }, [mp]);

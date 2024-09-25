@@ -7,12 +7,20 @@ export type BracketDefinition = {
   meta: Kv<string>;
 };
 
+export type BracketDictionary = {
+  bracketId: number;
+  dictIds: number[];
+  dictNames: string[];
+};
+
 export type GetBracketsRequest = {};
 
 export type GetBracketsResponse = {
   success: boolean;
   error: string;
   brackets: BracketDefinition[];
+  dictionaries: BracketDictionary[];
+  refreshSecUTC: number;
 };
 
 export type MatchmakingRequest = {

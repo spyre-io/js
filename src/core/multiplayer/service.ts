@@ -1,5 +1,6 @@
 import {
   BracketDefinition,
+  BracketDictionary,
   GetBracketsResponse,
   MatchmakingAcceptResponse,
   MatchmakingResponse,
@@ -38,10 +39,12 @@ export class MultiplayerService
   matchBracketDefId: WatchedValue<number | null> = new WatchedValue<
     number | null
   >(null);
+  bracketRefreshSecUTC: WatchedValue<number> = new WatchedValue<number>(0);
 
   private _context: IMatchContext | null = null;
   private _handler: IMatchHandler | null = null;
-  private _brackets: BracketDefinition[] = [];
+  private _brackets: (BracketDefinition &
+    Pick<BracketDictionary, "dictIds" | "dictNames">)[] = [];
   private _dataQueue: {opCode: number; data: Uint8Array}[] = [];
 
   private clock: ClockService | null = null;
@@ -54,7 +57,8 @@ export class MultiplayerService
     //
   }
 
-  get brackets(): BracketDefinition[] {
+  get brackets(): (BracketDefinition &
+    Pick<BracketDictionary, "dictIds" | "dictNames">)[] {
     return this._brackets;
   }
 
@@ -76,7 +80,27 @@ export class MultiplayerService
       {game: "hangman"},
     );
 
-    this._brackets = res.brackets.sort((a, b) => a.id - b.id);
+    const {brackets, dictionaries, refreshSecUTC} = res;
+    this._brackets = brackets
+      .sort((a, b) => a.id - b.id)
+      .map((b) => {
+        const dict = dictionaries.find((d) => d.bracketId === b.id);
+        if (!dict) {
+          return {
+            ...b,
+            dictIds: [],
+            dictNames: [],
+          };
+        }
+
+        return {
+          ...b,
+          dictIds: dict.dictIds,
+          dictNames: dict.dictNames,
+        };
+      });
+
+    this.bracketRefreshSecUTC.setValue(refreshSecUTC);
   }
 
   async findMatches(bracketId: number): Promise<void> {

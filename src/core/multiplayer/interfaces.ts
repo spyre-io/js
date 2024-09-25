@@ -1,4 +1,4 @@
-import {BracketDefinition} from "./types.gen";
+import {BracketDefinition, BracketDictionary} from "./types.gen";
 import {MatchmakingInfo} from "@/core/shared/types.gen";
 import {Kv, WatchedValue} from "@/core/shared/types";
 import {Match} from "@heroiclabs/nakama-js";
@@ -11,7 +11,9 @@ import {
 } from "./types";
 
 export interface IMultiplayerService {
-  get brackets(): BracketDefinition[];
+  get brackets(): (BracketDefinition &
+    Pick<BracketDictionary, "dictIds" | "dictNames">)[];
+  get bracketRefreshSecUTC(): WatchedValue<number>;
 
   get matchmakingInfo(): WatchedValue<MatchmakingInfo | null>;
   get matchJoinIds(): WatchedValue<string[]>;
