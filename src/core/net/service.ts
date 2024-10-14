@@ -187,8 +187,8 @@ export class ConnectionService
     retries: number,
   ): Promise<Match> {
     if (!this._socket) {
-      await this.connect();
       await waitMs(getBackoffMs(retries));
+      await this.connect();
 
       return this.join(matchId, meta, retries + 1);
     }
@@ -240,7 +240,10 @@ export class ConnectionService
 
     // reconnect if necessary
     if (!this._socket) {
+      await waitMs(getBackoffMs(retries));
       await this.connect();
+
+      return this.sendMatchState(matchId, opCode, payload, retries + 1);
     }
 
     logger.debug(
@@ -260,10 +263,9 @@ export class ConnectionService
           retries,
         );
 
-        this.disconnect();
-        await this.connect();
+        // todo: clear socket?
 
-        return await this.sendMatchState(matchId, opCode, payload, retries + 1);
+        return this.sendMatchState(matchId, opCode, payload, retries + 1);
       } else {
         logger.debug(
           `Failed sendMatchState for unhandled reason: @Error`,
@@ -285,11 +287,10 @@ export class ConnectionService
     }
 
     if (!this._session) {
-      try {
-        await this.connect();
-      } catch {
-        return await this.getApi(fn, retries + 1);
-      }
+      await waitMs(getBackoffMs(retries));
+      await this.connect();
+
+      return this.getApi(fn, retries + 1);
     }
 
     try {
@@ -302,10 +303,9 @@ export class ConnectionService
           retries,
         );
 
-        this.disconnect();
-        await this.connect();
+        // todo: clear session?
 
-        return await this.getApi(fn, retries + 1);
+        return this.getApi(fn, retries + 1);
       } else {
         logger.debug(`Failed API request for unhandled reason: @Error`, error);
 
@@ -342,7 +342,7 @@ export class ConnectionService
     } catch (error) {
       logger.info("Failed to authenticate: @Error", error);
 
-      return await this.connectWithRetries(cancelToken, retries + 1);
+      return this.connectWithRetries(cancelToken, retries + 1);
     }
 
     if (cancelToken.cancelled) {
@@ -355,7 +355,7 @@ export class ConnectionService
     } catch (error) {
       logger.info("Failed to connect: @Error", error);
 
-      return await this.connectWithRetries(cancelToken, retries + 1);
+      return this.connectWithRetries(cancelToken, retries + 1);
     }
 
     if (cancelToken.cancelled) {
@@ -385,7 +385,7 @@ export class ConnectionService
     this._session = session;
 
     // kick-off heartbeat
-    this.heartbeat(newCancelToken());
+    this.heartbeat(cancelToken);
 
     // check for active match
     if (this._matchId) {
@@ -444,7 +444,8 @@ export class ConnectionService
 
       // check cancel
       if (cancelToken.cancelled) {
-        throw new Error("cancelled");
+        // nothing is handling this, just return
+        return;
       }
 
       // only heartbeat if we have a session
@@ -459,49 +460,50 @@ export class ConnectionService
           const isRefreshed = await this.refreshSession();
 
           if (cancelToken.cancelled) {
-            throw new Error("cancelled");
+            // nothing is handling this, just return
+            return;
           }
 
           if (!isRefreshed) {
             this.disconnect();
 
-            // ignore async nature
-            this.connect();
+            // ignore async nature, but catch errors
+            this.connect().catch(() => {});
           }
-        } else {
-          if (this._socket) {
-            // ping with keep alive
-            let res;
-            try {
-              res = await this._socket.rpc("heartbeat/ping", "{}");
-            } catch (error) {
-              logger.debug("Heartbeat failed!");
-
-              if (cancelToken.cancelled) {
-                throw new Error("cancelled");
-              }
-
-              this.disconnect();
-              this.connect();
-
-              continue;
-            }
+        } else if (this._socket) {
+          // ping with keep alive
+          let res;
+          try {
+            res = await this._socket.rpc("heartbeat/ping", "{}");
+          } catch (error) {
+            logger.debug("Heartbeat failed!");
 
             if (cancelToken.cancelled) {
-              throw new Error("cancelled");
-            }
-
-            const {payload} = res;
-            const {runtimeId} = JSON.parse(payload || "{}");
-            if (this._runtimeId === null) {
-              this._runtimeId = runtimeId;
-            } else if (this._runtimeId !== runtimeId) {
-              // full refresh
-              logger.info("Runtime ID mismatch! Full refresh.");
-
-              window.location.reload();
+              // nothing is handling this, just return
               return;
             }
+
+            this.disconnect();
+            this.connect().catch(() => {});
+
+            continue;
+          }
+
+          if (cancelToken.cancelled) {
+            // nothing is handling this, just return
+            return;
+          }
+
+          const {payload} = res;
+          const {runtimeId} = JSON.parse(payload || "{}");
+          if (this._runtimeId === null) {
+            this._runtimeId = runtimeId;
+          } else if (this._runtimeId !== runtimeId) {
+            // full refresh
+            logger.info("Runtime ID mismatch! Full refresh.");
+
+            window.location.reload();
+            return;
           }
         }
       }
