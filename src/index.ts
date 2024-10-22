@@ -17,7 +17,12 @@ export type {HistoryItem, HistorySummaryItem} from "@/core/history/types.gen";
 
 // core/leaderboards
 export type {ILeaderboardService} from "@/core/leaderboards/interfaces";
-export type {LeaderboardEntry} from "@/core/leaderboards/types";
+export type {
+  LbWinnersResponse,
+  LbListResponse,
+  LbRecord,
+  RewardDefinition,
+} from "@/core/leaderboards/types";
 
 // core/multiplayer
 export type {
@@ -122,12 +127,7 @@ export {
 export {useHistoryFind, useHistoryGet} from "@/react/hooks/use-history";
 
 // react/hooks/leaderboard
-export {
-  useLb,
-  useLbDaily,
-  useLbWeekly,
-  useLbAll,
-} from "@/react/hooks/use-leaderboards";
+export {useLbGet, useLbWinners} from "@/react/hooks/use-leaderboards";
 
 // react/hooks/multiplayer
 export {

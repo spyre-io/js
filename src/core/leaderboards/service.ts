@@ -1,54 +1,60 @@
-import {INakamaClientService} from "../net/interfaces";
+import {IRpcService} from "../net/interfaces";
 import {childLogger} from "../util/logger";
 import {ILeaderboardService} from "./interfaces";
-import {LeaderboardEntry} from "./types";
+import {
+  GetLbResponse,
+  GetLbWinnersResponse,
+  LbListResponse,
+  LbWinnersResponse,
+  LeaderboardInterval,
+} from "./types";
 
 const logger = childLogger("becky:leaderboard");
 
 export class LeaderboardService implements ILeaderboardService {
-  constructor(private readonly _nakama: INakamaClientService) {
+  constructor(private readonly _rpc: IRpcService) {
     //
   }
 
-  async list(name: string, count: number): Promise<LeaderboardEntry[]> {
-    logger.debug("LeaderboardService.list(@Name, @Count)", name, count);
+  async list(
+    ns: string,
+    interval: LeaderboardInterval,
+  ): Promise<LbListResponse> {
+    logger.debug("LeaderboardService.list(@Ns, @Interval)", ns, interval);
 
-    return this._nakama.getApi(async (api, session) => {
-      const response = await api.listLeaderboardRecords(
-        session,
-        name,
-        undefined,
-        count,
-      );
-      if (!response.records) {
-        return [];
-      }
+    const res = await this._rpc.call<GetLbResponse>("leaderboard/get", {
+      ns,
+      interval,
+    });
+    if (!res.success) {
+      throw new Error(res.error);
+    }
 
-      return response.records.map((record) => ({
-        id: record.owner_id,
-        username: record.username,
-        score: record.score,
-        rank: record.rank,
-        updatedAt: record.update_time,
-      }));
-    }, 3);
+    return {
+      records: res.records,
+      nextRewards: res.nextRewards,
+    };
   }
 
-  async daily(tag: string, count: number = 100): Promise<LeaderboardEntry[]> {
-    logger.debug("LeaderboardService.daily(@Tag, @Count)", tag, count);
+  async winners(
+    ns: string,
+    interval: LeaderboardInterval,
+  ): Promise<LbWinnersResponse> {
+    logger.debug("LeaderboardService.winners(@Ns, @Interval)", ns, interval);
 
-    return this.list(`leaderboard.${tag}.daily`, count);
-  }
+    const res = await this._rpc.call<GetLbWinnersResponse>(
+      "leaderboard/winners",
+      {
+        ns,
+        interval,
+      },
+    );
+    if (!res.success) {
+      throw new Error(res.error);
+    }
 
-  async weekly(tag: string, count: number = 100): Promise<LeaderboardEntry[]> {
-    logger.debug("LeaderboardService.weekly(@Tag, @Count)", tag, count);
-
-    return this.list(`leaderboard.${tag}.weekly`, count);
-  }
-
-  async all(tag: string, count: number = 100): Promise<LeaderboardEntry[]> {
-    logger.debug("LeaderboardService.all(@Tag, @Count)", tag, count);
-
-    return this.list(`leaderboard.${tag}.all-time`, count);
+    return {
+      records: res.records,
+    };
   }
 }
