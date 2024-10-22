@@ -2,20 +2,20 @@ import {useQuery} from "@tanstack/react-query";
 import {useClient} from "./use-client";
 import {LeaderboardInterval} from "@/core/leaderboards/types";
 
-export const useLbGet = (ns: string, cohort: LeaderboardInterval) => {
+export const useLbGet = (ns: string, interval: LeaderboardInterval) => {
   const client = useClient();
 
   return useQuery({
-    queryKey: ["leaderboard-get", ns, cohort],
-    queryFn: async () => await client.leaderboards.list(ns, cohort),
+    queryKey: ["leaderboard-get", ns, interval],
+    queryFn: async () => await client.leaderboards.list(ns, interval),
   });
 };
 
-export const useLbWinners = (ns: string, cohort: LeaderboardInterval) => {
+export const useLbWinners = (ns: string, interval: LeaderboardInterval) => {
   const client = useClient();
 
   return useQuery({
-    queryKey: ["leaderboard-winners", ns, cohort],
-    queryFn: async () => await client.leaderboards.winners(ns, cohort),
+    queryKey: ["leaderboard-winners", ns, interval],
+    queryFn: async () => await client.leaderboards.winners(ns, interval),
   });
 };
