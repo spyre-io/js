@@ -39,7 +39,7 @@ export enum SigningErrorType {
   WRONG_CHAIN = -32603,
 }
 
-export class SigniningError extends Error {
+export class SigningError extends Error {
   constructor(
     public readonly type: SigningErrorType,
     message: string = "Could not sign data.",

@@ -1,16 +1,4 @@
 import {
-  Signature,
-  SigningErrorType,
-  SigniningError,
-  SignStakeParameters,
-  Txn,
-  Web3Address,
-  Web3Config,
-  Web3ConnectionStatus,
-} from "./types";
-
-import {
-  bigIntToString,
   getDepositDomain,
   getDepositTypes,
   getPermitDomain,
@@ -18,9 +6,38 @@ import {
   getRSV,
   getStakingDomain,
   getStakingTypes,
-} from "./helpers";
-import {base, baseSepolia, Chain} from "thirdweb/chains";
-import {ConnectionManager} from "thirdweb/wallets";
+} from "@/core/helpers";
+
+import {
+  Signature,
+  SigningErrorType,
+  SigningError,
+  SignStakeParameters,
+  Txn,
+  Web3Address,
+  Web3Config,
+  Web3ConnectionStatus,
+  bigIntToString,
+  asyncOps,
+  IAccountService,
+  WatchedValue,
+  WatchedAsyncValue,
+  SpyreError,
+  CancelToken,
+  SpyreErrorCode,
+  IRpcService,
+  AuthWalletVerifyResponse,
+  DepositResponse,
+  GetLinkChallengeResponse,
+  GetNonceResponse,
+  GetTxnRpcResponse,
+  PermitResponse,
+  Dispatcher,
+  Messages,
+  childLogger,
+  IWeb3Service,
+} from "@spyre-io/js";
+
 import {
   getContract,
   Hex,
@@ -28,39 +45,9 @@ import {
   ThirdwebClient,
   ThirdwebContract,
 } from "thirdweb";
-import {asyncOps} from "@/core/util/async";
-import {IAccountService} from "@/core/account/interfaces";
+import {base, baseSepolia, Chain} from "thirdweb/chains";
+import {ConnectionManager} from "thirdweb/wallets";
 import {ReadContractResult} from "thirdweb/dist/types/transaction/read-contract";
-import {
-  WatchedValue,
-  WatchedAsyncValue,
-  SpyreError,
-  CancelToken,
-} from "@/core/shared/types";
-import {SpyreErrorCode} from "@/core/shared/errors";
-import {IRpcService} from "@/core/net/interfaces";
-import {
-  AuthWalletVerifyResponse,
-  DepositResponse,
-  GetLinkChallengeResponse,
-  GetNonceResponse,
-  GetTxnRpcResponse,
-  PermitResponse,
-} from "./types.gen";
-import {Dispatcher} from "@/core/shared/dispatcher";
-import {Messages} from "@/core/shared/message";
-import {childLogger} from "../util/logger";
-import {IWeb3Service} from "./interfaces";
-
-/*export const useHangmanDomain = () => {
-  const params = useWeb3Contants();
-  return {
-    "name": "gamestaking",
-    "version": "1",
-    "chainId": params.chainId.toHexString(),
-    "verifyingContract": params.contracts.staking.addr,
-  };
-};*/
 
 const logger = childLogger("becky:web3");
 
@@ -649,20 +636,17 @@ export class ThirdWebWeb3Service implements IWeb3Service {
     } catch (error) {
       if ((error as any).code === 4001) {
         // user canceled -- do nothing
-        throw new SigniningError(SigningErrorType.USER_CANCELED);
+        throw new SigningError(SigningErrorType.USER_CANCELED);
       }
 
       if ((error as any).code === -32603) {
         // TODO: wrong chain
         //switchChain(network);
 
-        throw new SigniningError(SigningErrorType.WRONG_CHAIN);
+        throw new SigningError(SigningErrorType.WRONG_CHAIN);
       }
 
-      throw new SigniningError(
-        SigningErrorType.UNKNOWN,
-        (error as any).message,
-      );
+      throw new SigningError(SigningErrorType.UNKNOWN, (error as any).message);
     }
 
     cancel?.throwIfCancelled();

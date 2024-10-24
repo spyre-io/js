@@ -1,28 +1,11 @@
-import {useActiveWalletConnectionStatus} from "thirdweb/react";
 import {useAccount} from "./use-account";
 import {useClient} from "./use-client";
 import {useCallback, useSyncExternalStore} from "react";
 import {SignStakeParameters, Txn, Web3Address} from "@/core/web3/types";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
-import {ThirdWebWeb3Service} from "@/core/web3/service";
 import {childLogger} from "@/core/util/logger";
 
 const logger = childLogger("becky:hooks:use-web3");
-
-// not exported in index
-export const useWeb3Thirdweb = () => {
-  const web3 = useClient().web3;
-
-  return (web3 as ThirdWebWeb3Service).thirdweb;
-};
-
-export const useWeb3ThirdwebNetwork = () => {
-  const web3 = useClient().web3;
-
-  return (web3 as ThirdWebWeb3Service).network;
-};
-
-// exported
 
 /**
  * Retrieves the current {@link Web3Config} object from the {@link IWeb3Service}.
@@ -39,16 +22,24 @@ export const useWeb3Config = () => {
   return web3.config;
 };
 
-export const useWeb3ConnectionStatus = () => useActiveWalletConnectionStatus();
+export const useWeb3ConnectionStatus = () => {
+  const web3 = useClient().web3;
+
+  return useSyncExternalStore(
+    web3.status.watch,
+    web3.status.getValue,
+    web3.status.getValue,
+  );
+};
 
 export const useWeb3IsWalletConnected = () => {
-  const status = useActiveWalletConnectionStatus();
+  const status = useWeb3ConnectionStatus();
 
   return status === "connected";
 };
 
 export const useWeb3IsWalletConnectedAndLinked = () => {
-  const status = useActiveWalletConnectionStatus();
+  const status = useWeb3ConnectionStatus();
   const connectedAddress = useWeb3ActiveAddress();
   const {data: account} = useAccount();
 

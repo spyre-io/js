@@ -1,7 +1,8 @@
 import {useCallback, useContext, useMemo} from "react";
-import {SpyreClientCtx} from "../client-provider";
-import {getDeviceId} from "../../core/util";
+import {getDeviceId} from "@/core/util";
 import {useQueryClient} from "@tanstack/react-query";
+import {ISpyreClient} from "@/core/interfaces";
+import {SpyreClientCtx} from "@/react/client-provider";
 
 /**
  * Returns the current {@link ISpyreClient} implementaion.
@@ -11,7 +12,7 @@ import {useQueryClient} from "@tanstack/react-query";
  * await client.account.refresh();
  * ```
  */
-export const useClient = () => {
+export const useClient = (): ISpyreClient => {
   const context = useContext(SpyreClientCtx);
   if (!context) {
     throw new Error("useClient must be used within a SpyreClientProvider.");

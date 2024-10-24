@@ -1,7 +1,7 @@
 {
-  "name": "@spyre-io/js",
+  "name": "@spyre-io/js-thirdweb",
   "version": "0.1.12",
-  "description": "Typescript SDK for working with Spyre.",
+  "description": "Typescript SDK for working with Spyre on Thirdweb.",
   "homepage": "https://github.com/spyre-io/js",
   "repository": "github:spyre-io/js",
   "license": "MIT",
@@ -56,6 +56,7 @@
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",
     "@vitejs/plugin-react": "^4.2.1",
+    "@spyre-io/js": "^0.1.12",
     "dts-bundle-generator": "^9.5.1",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",

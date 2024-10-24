@@ -3,9 +3,12 @@ import {defaultTheme, wallets} from "@/react/client-provider";
 import {
   useWeb3Config,
   useWeb3ConnectionStatus,
+  Web3ConnectionStatus,
+} from "@spyre-io/js";
+import {
   useWeb3Thirdweb,
   useWeb3ThirdwebNetwork,
-} from "@/react/hooks/use-web3";
+} from "@/react/hooks/use-thirdweb";
 import {ConnectButton, Theme} from "thirdweb/react";
 
 /**
@@ -94,7 +97,6 @@ export function WalletConnection({
     [connected, connecting, disconnected, thirdweb, network, web3Config],
   );
 
-  const status = useWeb3ConnectionStatus();
-
+  const status = useWeb3ConnectionStatus() as Web3ConnectionStatus;
   return config[status]();
 }

@@ -3,20 +3,24 @@
 // core/account
 export type {User} from "@/core/account/types";
 export type {IAccountService} from "@/core/account/interfaces";
+export {AccountService} from "@/core/account/service";
 
 // core/clock
 export type {IClockService} from "@/core/clock/interfaces";
+export {ClockService} from "@/core/clock/service";
 
 // core/history
 export type {
   IHistoryService,
   HistorySearchResults,
 } from "@/core/history/interfaces";
+export {HistoryService} from "@/core/history/service";
 export type {HistorySearchCriteria} from "@/core/history/types";
 export type {HistoryItem, HistorySummaryItem} from "@/core/history/types.gen";
 
 // core/leaderboards
 export type {ILeaderboardService} from "@/core/leaderboards/interfaces";
+export {LeaderboardService} from "@/core/leaderboards/service";
 export type {
   LbWinnersResponse,
   LbListResponse,
@@ -31,6 +35,7 @@ export type {
   IMatchHandlerFactory,
   IMatchContext,
 } from "@/core/multiplayer/interfaces";
+export {MultiplayerService} from "@/core/multiplayer/service";
 export type {
   MatchmakingAcceptSignals,
   MatchmakingBracketInfo,
@@ -43,23 +48,26 @@ export type {BracketDefinition} from "@/core/multiplayer/types.gen";
 
 // core/net
 export type {IRpcService, IConnectionService} from "@/core/net/interfaces";
+export {ConnectionService} from "@/core/net/service";
 
 // core/notifications
 export type {INotificationService} from "@/core/notifications/interfaces";
+export {NotificationService} from "@/core/notifications/service";
 export type {Notification, NotificationCodes} from "@/core/notifications/types";
 
 // core/shared
 export type {
   AsyncOp,
-  SpyreError,
   Kv,
   AsyncValue,
-  CancelToken,
   WatchedAsyncValue,
-  WatchedValue,
+  CancelToken,
 } from "@/core/shared/types";
-
+export {WatchedValue, SpyreError} from "@/core/shared/types";
 export type {MatchmakingInfo} from "@/core/shared/types.gen";
+export {Dispatcher} from "@/core/shared/dispatcher";
+export {Messages} from "@/core/shared/message";
+export {SpyreErrorCode} from "@/core/shared/errors";
 
 // core/util
 export {logger, childLogger, getHistory} from "@/core/util/logger";
@@ -70,10 +78,10 @@ export {getBackoffMs, waitMs} from "@/core/util/net";
 
 // core/vault
 export type {IVaultService} from "@/core/vault/interfaces";
+export {VaultService} from "@/core/vault/service";
 export type {TimedVault} from "@/core/vault/types.gen";
 
 // core/web3
-export {fromWei, toWei} from "@/core/web3/helpers";
 export type {IWeb3Service} from "@/core/web3/interfaces";
 export type {
   Web3Address,
@@ -82,22 +90,26 @@ export type {
   ContractConfig,
   Signature,
   SignStakeParameters,
-  SigningErrorType,
   TxnStatus,
-  Txn,
 } from "@/core/web3/types";
+export {SigningError, SigningErrorType, Txn} from "@/core/web3/types";
+export type {
+  AuthWalletVerifyResponse,
+  DepositResponse,
+  GetLinkChallengeResponse,
+  GetNonceResponse,
+  GetTxnRpcResponse,
+  PermitResponse,
+} from "@/core/web3/types.gen";
+export {bigIntToString, toWei, fromWei} from "@/core/web3/helpers";
 
 // client
-export {createSpyreClient} from "@/core/client";
+export {SpyreClient} from "@/core/client";
 export type {ISpyreClient} from "@/core/interfaces";
 export type {CreateSpyreClientOptions, LogConfig} from "@/core/types";
 
 ///////////////////////////////////////////////////////////////////////// react
-export {SpyreClientProvider, SpyreConnect} from "@/react/client-provider";
-
-// react/components
-export {WalletConnection} from "@/react/components/WalletConnection";
-export type {WalletConnectionProps} from "@/react/components/WalletConnection";
+export {SpyreClientCtx} from "@/react/client-provider";
 
 // react/hooks
 export {useClient, useDeviceId} from "@/react/hooks/use-client";
