@@ -23,7 +23,7 @@
     "dev": "nodemon -x pnpm build",
     "build": "tsc && node ./scripts/fix-tsc.js",
     "doc": "typedoc --out docs src",
-    "prepare": "husky",
+    "prepare": "cd .. && husky",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\""
   },
