@@ -1,14 +1,10 @@
-import {AppMetadata} from "thirdweb/dist/types/wallets/types";
-
 export type Web3Address = `0x${string}`;
 
 export type Web3ConnectionStatus = "connected" | "disconnected" | "connecting";
 
 export type Web3Config = {
-  thirdweb: {
-    clientId: string;
-    metadata: AppMetadata;
-  };
+  providerType: string;
+  providerConfig: any;
   name: string;
   chainId: number;
   contracts: {[name: string]: ContractConfig};

@@ -52,8 +52,11 @@ export function SpyreClientProvider(
   }>,
 ) {
   const thirdWebClient = useMemo(
-    () => createThirdwebClient({clientId: props.config.web3.thirdweb.clientId}),
-    [props.config.web3.thirdweb.clientId],
+    () =>
+      createThirdwebClient({
+        clientId: props.config.web3.providerConfig.clientId,
+      }),
+    [props.config.web3.providerConfig.clientId],
   );
 
   return (
@@ -61,7 +64,7 @@ export function SpyreClientProvider(
       <AutoConnect
         wallets={wallets}
         client={thirdWebClient}
-        appMetadata={props.config.web3.thirdweb.metadata}
+        appMetadata={props.config.web3.providerConfig.metadata}
       />
       <ThirdwebContextWrapper
         config={props.config}
@@ -130,7 +133,7 @@ export function SpyreConnect({theme}: {theme?: Theme}) {
       modalSize="compact"
       chain={thirdwebService.network}
       showThirdwebBranding={false}
-      appMetadata={thirdwebService.config.thirdweb.metadata}
+      appMetadata={thirdwebService.config.providerConfig.metadata}
     />
   );
 }
