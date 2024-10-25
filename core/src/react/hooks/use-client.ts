@@ -17,13 +17,13 @@ export const useClient = (): ISpyreClient => {
   if (!context) {
     throw new Error("useClient must be used within a SpyreClientProvider.");
   }
-
+  /*
   const queryClient = useQueryClient();
   const invalidateMatches = useCallback(() => {
     // Invalidate match + matches query
   }, [context, queryClient]);
   //useNotifHandler(NotificationCodes.BlockchainStakeStatus, invalidateMatches);
-
+*/
   return context;
 };
 

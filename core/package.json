@@ -1,6 +1,6 @@
 {
   "name": "@spyre-io/js",
-  "version": "0.1.12",
+  "version": "0.1.12-beta.1",
   "description": "Typescript SDK for working with Spyre.",
   "homepage": "https://github.com/spyre-io/js",
   "repository": "github:spyre-io/js",
@@ -74,10 +74,5 @@
     "typescript": "^5.4.2",
     "vite": "^5.2.13",
     "vite-plugin-dts": "^3.9.1"
-  },
-  "pnpm": {
-    "overrides": {
-      "@walletconnect/jsonrpc-types": "1.0.3"
-    }
   }
 }

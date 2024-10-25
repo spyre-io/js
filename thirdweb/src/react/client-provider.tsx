@@ -1,4 +1,6 @@
-import {ConnectionManager, createWallet, inAppWallet} from "thirdweb/wallets";
+"use-client";
+
+import {createWallet, inAppWallet} from "thirdweb/wallets";
 import {
   AutoConnect,
   ConnectEmbed,
@@ -46,11 +48,12 @@ export const wallets = [
  * }
  * ```
  */
-export function SpyreClientProvider(
+export function ThirdwebSpyreClientProvider(
   props: PropsWithChildren<{
     config: CreateSpyreClientOptions;
   }>,
 ) {
+  const queryClient = useRef(new QueryClient());
   const thirdWebClient = useMemo(
     () =>
       createThirdwebClient({
@@ -60,19 +63,21 @@ export function SpyreClientProvider(
   );
 
   return (
-    <ThirdwebProvider>
-      <AutoConnect
-        wallets={wallets}
-        client={thirdWebClient}
-        appMetadata={props.config.web3.providerConfig.metadata}
-      />
-      <ThirdwebContextWrapper
-        config={props.config}
-        thirdwebClient={thirdWebClient}
-      >
-        {props.children}
-      </ThirdwebContextWrapper>
-    </ThirdwebProvider>
+    <QueryClientProvider client={queryClient.current}>
+      <ThirdwebProvider>
+        <AutoConnect
+          wallets={wallets}
+          client={thirdWebClient}
+          appMetadata={props.config.web3.providerConfig.metadata}
+        />
+        <ThirdwebContextWrapper
+          config={props.config}
+          thirdwebClient={thirdWebClient}
+        >
+          {props.children}
+        </ThirdwebContextWrapper>
+      </ThirdwebProvider>
+    </QueryClientProvider>
   );
 }
 
@@ -82,7 +87,6 @@ function ThirdwebContextWrapper(
     thirdwebClient: ThirdwebClient;
   }>,
 ) {
-  const queryClient = useRef(new QueryClient());
   const connectionManager = useConnectionManager();
   const client = useMemo(
     () =>
@@ -95,11 +99,9 @@ function ThirdwebContextWrapper(
   );
 
   return (
-    <QueryClientProvider client={queryClient.current}>
-      <SpyreClientCtx.Provider value={client}>
-        {props.children}
-      </SpyreClientCtx.Provider>
-    </QueryClientProvider>
+    <SpyreClientCtx.Provider value={client}>
+      {props.children}
+    </SpyreClientCtx.Provider>
   );
 }
 

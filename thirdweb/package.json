@@ -1,9 +1,12 @@
 {
   "name": "@spyre-io/js-thirdweb",
-  "version": "0.1.12",
+  "version": "0.1.0",
   "description": "Typescript SDK for working with Spyre on Thirdweb.",
   "homepage": "https://github.com/spyre-io/js",
-  "repository": "github:spyre-io/js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/spyre-io/js.git"
+  },
   "license": "MIT",
   "keywords": [
     "spyre",
