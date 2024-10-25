@@ -1,3 +1,5 @@
+"use-client";
+
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 import {PropsWithChildren, useMemo, useRef} from "react";
 import {CreateSpyreClientOptions, SpyreClientCtx} from "@spyre-io/js";
