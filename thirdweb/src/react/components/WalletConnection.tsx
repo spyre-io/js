@@ -3,6 +3,7 @@ import {defaultTheme, wallets} from "@/react/client-provider";
 import {
   useWeb3Config,
   useWeb3ConnectionStatus,
+  Web3Config,
   Web3ConnectionStatus,
 } from "@spyre-io/js";
 import {
@@ -47,7 +48,7 @@ export function WalletConnection({
 }: WalletConnectionProps) {
   const thirdweb = useWeb3Thirdweb();
   const network = useWeb3ThirdwebNetwork();
-  const web3Config = useWeb3Config();
+  const web3Config: Web3Config = useWeb3Config();
 
   const config = useMemo(
     () => ({
@@ -60,7 +61,7 @@ export function WalletConnection({
             theme={theme || defaultTheme}
             connectModal={{size: "compact"}}
             chain={network}
-            appMetadata={web3Config.thirdweb.metadata}
+            appMetadata={web3Config.providerConfig.metadata}
             supportedTokens={{
               84532: [
                 {

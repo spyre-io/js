@@ -1,6 +1,6 @@
 {
   "name": "@spyre-io/js-thirdweb",
-  "version": "0.1.1-beta.1",
+  "version": "0.1.1-beta.2",
   "description": "Typescript SDK for working with Spyre on Thirdweb.",
   "homepage": "https://github.com/spyre-io/js",
   "repository": {
