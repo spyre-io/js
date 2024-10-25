@@ -32,18 +32,18 @@ export const wallets = [
 ];
 
 /**
- * The `SpyreClientProvider` is a React component that provides the Spyre client, context, and hooks to the rest of the application.
+ * The `ThirdwebSpyreClientProvider` is a React component that provides the Spyre client, context, and hooks to the rest of the application.
  *
  * Wrap your application in this provider to access the Spyre client and its services.
  *
  * ```ts
- * import { SpyreClientProvider } from "@spyre-io/becky";
+ * import { ThirdwebSpyreClientProvider } from "@spyre-io/js-thirdweb";
  *
  * function Example() {
  *  return (
- *    <SpyreClientProvider config={config}>
+ *    <ThirdwebSpyreClientProvider config={config}>
  *      <App />
- *   </SpyreClientProvider>
+ *   </ThirdwebSpyreClientProvider>
  *   );
  * }
  * ```

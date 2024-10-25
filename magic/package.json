@@ -1,0 +1,83 @@
+{
+  "name": "@spyre-io/js-magic",
+  "version": "0.1.1-beta.1",
+  "description": "Typescript SDK for working with Spyre on Magic.",
+  "homepage": "https://github.com/spyre-io/js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/spyre-io/js.git"
+  },
+  "license": "MIT",
+  "keywords": [
+    "spyre",
+    "web3",
+    "games",
+    "typescript",
+    "npm",
+    "package"
+  ],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "nodemon -x pnpm build",
+    "build": "tsc && node ./scripts/fix-tsc.js",
+    "doc": "typedoc --out docs src",
+    "prepare": "cd .. && husky",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\""
+  },
+  "husky": {
+    "hooks": {
+      "pre-push": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json,css,scss}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
+  },
+  "dependencies": {
+    "@heroiclabs/nakama-js": "^2.8.0",
+    "@magic-ext/aptos": "^11.16.0",
+    "@magic-sdk/provider": "^28.16.0",
+    "@spyre-io/js": "0.1.12-beta.1",
+    "@tanstack/react-query": "5.29.2",
+    "@types/uuid": "^10.0.0",
+    "magic-sdk": "^28.17.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.2.0",
+    "uuid": "^10.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.24",
+    "@types/react": "^18.2.47",
+    "@types/react-dom": "^18.2.18",
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "dts-bundle-generator": "^9.5.1",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "eslint-plugin-react": "^7.35.0",
+    "eslint-plugin-unused-imports": "^4.0.1",
+    "husky": "^9.1.4",
+    "lint-staged": "^15.2.7",
+    "nodemon": "^3.1.4",
+    "prettier": "^3.3.3",
+    "stylelint": "^16.2.1",
+    "stylelint-config-recommended": "^14.0.0",
+    "stylelint-config-sass-guidelines": "^11.0.0",
+    "tslib": "^2.6.2",
+    "typedoc": "^0.26.5",
+    "typedoc-github-theme": "^0.1.1",
+    "typescript": "^5.4.2",
+    "vite": "^5.2.13",
+    "vite-plugin-dts": "^3.9.1"
+  }
+}
