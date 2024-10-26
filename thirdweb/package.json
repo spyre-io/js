@@ -43,15 +43,17 @@
   },
   "dependencies": {
     "@heroiclabs/nakama-js": "^2.8.0",
-    "@spyre-io/js": "0.1.12-beta.1",
-    "@tanstack/react-query": "5.29.2",
     "@types/uuid": "^10.0.0",
     "ethers": "^6.13.2",
     "pino-pretty": "^11.2.2",
-    "react": "^18.3.1",
-    "react-dom": "^18.2.0",
     "thirdweb": "^5.43.2",
     "uuid": "^10.0.0"
+  },
+  "peerDependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.2.0",
+    "@tanstack/react-query": "5.29.2",
+    "@spyre-io/js": "0.1.12-beta.1"
   },
   "devDependencies": {
     "@types/node": "^20.11.24",

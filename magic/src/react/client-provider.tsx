@@ -18,18 +18,22 @@ export function MagicSpyreClientProvider({
   const magic = useMemo(() => {
     const magicConfig = config.web3.providerConfig;
 
-    return new Magic(magicConfig.publishableKey, {
-      extensions: [
-        new AptosExtension({
-          nodeUrl: magicConfig.aptos.nodeUrl,
-        }),
-      ],
-    });
+    if (typeof window !== "undefined") {
+      return new Magic(magicConfig.publishableKey, {
+        extensions: [
+          new AptosExtension({
+            nodeUrl: magicConfig.aptos.nodeUrl,
+          }),
+        ],
+      });
+    }
+
+    return null;
   }, [config]);
 
   return (
     <QueryClientProvider client={queryClient.current}>
-      <MagicContextWrapper config={config} magic={magic}>
+      <MagicContextWrapper config={config} magic={magic!}>
         {children}
       </MagicContextWrapper>
     </QueryClientProvider>

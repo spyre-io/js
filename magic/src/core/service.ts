@@ -1,6 +1,7 @@
 import {AptosExtension, MagicAptosWallet} from "@magic-ext/aptos";
 import {Extension, InstanceWithExtensions, SDKBase} from "@magic-sdk/provider";
 import {
+  asyncOps,
   CancelToken,
   IWeb3Service,
   Signature,
@@ -14,6 +15,21 @@ import {
 
 export class MagicWeb3Service implements IWeb3Service {
   public readonly wallet: MagicAptosWallet;
+
+  public readonly status: WatchedValue<Web3ConnectionStatus> =
+    new WatchedValue<Web3ConnectionStatus>("disconnected");
+  public readonly activeAddress: WatchedValue<`0x${string}` | null> =
+    new WatchedValue<`0x${string}` | null>(null);
+  public readonly linkedAddress: WatchedValue<`0x${string}` | null> =
+    new WatchedValue<`0x${string}` | null>(null);
+  public readonly needsToSwitchChains: WatchedValue<boolean> =
+    new WatchedValue<boolean>(false);
+  public readonly isInAppWallet: WatchedValue<boolean> =
+    new WatchedValue<boolean>(true);
+  public readonly stakingBalance: WatchedAsyncValue<bigint>;
+  public readonly usdcBalance: WatchedAsyncValue<bigint>;
+  public readonly usdcPermitAmount: WatchedAsyncValue<bigint>;
+  public readonly withdrawAfter: WatchedAsyncValue<Date>;
 
   constructor(
     public readonly config: Web3Config,
@@ -31,42 +47,38 @@ export class MagicWeb3Service implements IWeb3Service {
         return await this.magic.aptos.getAccountInfo();
       },
     });
-  }
 
-  get status(): WatchedValue<Web3ConnectionStatus> {
-    throw new Error("Method not implemented.");
-  }
+    this.stakingBalance = {
+      value: new WatchedValue<bigint>(BigInt(0)),
+      fetch: new WatchedValue(asyncOps.new()),
+      refresh: async () => {
+        // todo
+      },
+    };
 
-  get activeAddress(): WatchedValue<`0x${string}` | null> {
-    throw new Error("Method not implemented.");
-  }
+    this.usdcBalance = {
+      value: new WatchedValue<bigint>(BigInt(0)),
+      fetch: new WatchedValue(asyncOps.new()),
+      refresh: async () => {
+        // todo
+      },
+    };
 
-  get linkedAddress(): WatchedValue<`0x${string}` | null> {
-    throw new Error("Method not implemented.");
-  }
+    this.usdcPermitAmount = {
+      value: new WatchedValue<bigint>(BigInt(0)),
+      fetch: new WatchedValue(asyncOps.new()),
+      refresh: async () => {
+        // todo
+      },
+    };
 
-  get needsToSwitchChains(): WatchedValue<boolean> {
-    throw new Error("Method not implemented.");
-  }
-
-  get stakingBalance(): WatchedAsyncValue<bigint> {
-    throw new Error("Method not implemented.");
-  }
-
-  get usdcBalance(): WatchedAsyncValue<bigint> {
-    throw new Error("Method not implemented.");
-  }
-
-  get usdcPermitAmount(): WatchedAsyncValue<bigint> {
-    throw new Error("Method not implemented.");
-  }
-
-  get withdrawAfter(): WatchedAsyncValue<Date> {
-    throw new Error("Method not implemented.");
-  }
-
-  get isInAppWallet(): WatchedValue<boolean> {
-    throw new Error("Method not implemented.");
+    this.withdrawAfter = {
+      value: new WatchedValue<Date>(new Date()),
+      fetch: new WatchedValue(asyncOps.new()),
+      refresh: async () => {
+        // todo
+      },
+    };
   }
 
   switchChain(): Promise<void> {

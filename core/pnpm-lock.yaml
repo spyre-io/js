@@ -4,9 +4,6 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-overrides:
-  '@walletconnect/jsonrpc-types': 1.0.3
-
 importers:
 
   .:
