@@ -15,6 +15,7 @@ import {
   Web3ConnectionStatus,
   Messages,
   Web3Address,
+  IAccountService,
 } from "@spyre-io/js";
 import {MagicWalletLinkResponse} from "./types.gen";
 
@@ -39,6 +40,7 @@ export class MagicWeb3Service implements IWeb3Service {
   constructor(
     private readonly _rpc: IRpcService,
     private readonly _events: IDispatcher<any>,
+    private readonly _account: IAccountService,
 
     public readonly config: Web3Config,
     public readonly magic: InstanceWithExtensions<
@@ -87,6 +89,12 @@ export class MagicWeb3Service implements IWeb3Service {
         // todo
       },
     };
+
+    // keep watch on the linked address
+    this._account.onUpdate((user) => {
+      this.linkedAddress.setValue(user.walletAddr);
+    });
+    this.linkedAddress.setValue(this._account.user.walletAddr);
   }
 
   async init() {
@@ -101,6 +109,9 @@ export class MagicWeb3Service implements IWeb3Service {
 
     if (isConnected) {
       this.status.setValue("connected");
+
+      const info = await this.magic.user.getInfo();
+      this.activeAddress.setValue(info.publicAddress);
     } else {
       this.status.setValue("disconnected");
     }
@@ -121,11 +132,13 @@ export class MagicWeb3Service implements IWeb3Service {
       throw new Error(res.error);
     }
 
-    // update local account custom_id
+    // update local data
     this.linkedAddress.setValue(res.addr);
+    this.activeAddress.setValue(res.addr);
     this._events.on(Messages.ACCOUNT_WALLET_CONNECTED, {
       addr: res.addr,
     });
+    this.status.setValue("connected");
   }
 
   signStake(

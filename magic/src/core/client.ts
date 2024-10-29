@@ -48,7 +48,13 @@ export function createMagicSpyreClient(
   const history = new HistoryService(connection);
   const vaults = new VaultService(connection);
 
-  const web3 = new MagicWeb3Service(connection, events, options.web3, magic);
+  const web3 = new MagicWeb3Service(
+    connection,
+    events,
+    account,
+    options.web3,
+    magic,
+  );
   web3.init();
 
   const multiplayer = new MultiplayerService(connection, web3, connection);
