@@ -89,6 +89,23 @@ export class MagicWeb3Service implements IWeb3Service {
     };
   }
 
+  async init() {
+    this.status.setValue("connecting");
+
+    let isConnected;
+    try {
+      isConnected = await this.magic.user.isLoggedIn();
+    } catch (e) {
+      isConnected = false;
+    }
+
+    if (isConnected) {
+      this.status.setValue("connected");
+    } else {
+      this.status.setValue("disconnected");
+    }
+  }
+
   switchChain(): Promise<void> {
     throw new Error("Method not implemented.");
   }
