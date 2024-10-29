@@ -48,6 +48,7 @@ import {
 import {base, baseSepolia, Chain} from "thirdweb/chains";
 import {ConnectionManager} from "thirdweb/wallets";
 import {ReadContractResult} from "thirdweb/dist/types/transaction/read-contract";
+import {IDispatcher} from "@spyre-io/js/dist/core/shared/dispatcher";
 
 const logger = childLogger("becky:web3");
 
@@ -78,7 +79,7 @@ export class ThirdWebWeb3Service implements IWeb3Service {
   };
 
   constructor(
-    private readonly _events: Dispatcher<any>,
+    private readonly _events: IDispatcher<any>,
     private readonly _account: IAccountService,
     private readonly _rpc: IRpcService,
     private readonly _connectionManager: ConnectionManager,

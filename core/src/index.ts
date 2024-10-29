@@ -66,6 +66,7 @@ export type {
 export {WatchedValue, SpyreError} from "@/core/shared/types";
 export type {MatchmakingInfo} from "@/core/shared/types.gen";
 export {Dispatcher} from "@/core/shared/dispatcher";
+export type {IDispatcher} from "@/core/shared/dispatcher";
 export {Messages} from "@/core/shared/message";
 export {SpyreErrorCode} from "@/core/shared/errors";
 

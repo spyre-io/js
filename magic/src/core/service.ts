@@ -3,7 +3,9 @@ import {Extension, InstanceWithExtensions, SDKBase} from "@magic-sdk/provider";
 import {
   asyncOps,
   CancelToken,
+  IRpcService,
   IWeb3Service,
+  IDispatcher,
   Signature,
   SignStakeParameters,
   Txn,
@@ -11,17 +13,20 @@ import {
   WatchedValue,
   Web3Config,
   Web3ConnectionStatus,
+  Messages,
+  Web3Address,
 } from "@spyre-io/js";
+import {MagicWalletLinkResponse} from "./types.gen";
 
 export class MagicWeb3Service implements IWeb3Service {
   public readonly wallet: MagicAptosWallet;
 
   public readonly status: WatchedValue<Web3ConnectionStatus> =
     new WatchedValue<Web3ConnectionStatus>("disconnected");
-  public readonly activeAddress: WatchedValue<`0x${string}` | null> =
-    new WatchedValue<`0x${string}` | null>(null);
-  public readonly linkedAddress: WatchedValue<`0x${string}` | null> =
-    new WatchedValue<`0x${string}` | null>(null);
+  public readonly activeAddress: WatchedValue<Web3Address | null> =
+    new WatchedValue<Web3Address | null>(null);
+  public readonly linkedAddress: WatchedValue<Web3Address | null> =
+    new WatchedValue<Web3Address | null>(null);
   public readonly needsToSwitchChains: WatchedValue<boolean> =
     new WatchedValue<boolean>(false);
   public readonly isInAppWallet: WatchedValue<boolean> =
@@ -32,6 +37,9 @@ export class MagicWeb3Service implements IWeb3Service {
   public readonly withdrawAfter: WatchedAsyncValue<Date>;
 
   constructor(
+    private readonly _rpc: IRpcService,
+    private readonly _events: IDispatcher<any>,
+
     public readonly config: Web3Config,
     public readonly magic: InstanceWithExtensions<
       SDKBase,
@@ -85,8 +93,22 @@ export class MagicWeb3Service implements IWeb3Service {
     throw new Error("Method not implemented.");
   }
 
-  link(cancel?: CancelToken): Promise<void> {
-    throw new Error("Method not implemented.");
+  async link(cancel?: CancelToken): Promise<void> {
+    const did = await this.magic.user.generateIdToken();
+    const res = await this._rpc.call<MagicWalletLinkResponse>(
+      "auth/magic/link",
+      {did},
+    );
+
+    if (!res.success) {
+      throw new Error(res.error);
+    }
+
+    // update local account custom_id
+    this.linkedAddress.setValue(res.addr);
+    this._events.on(Messages.ACCOUNT_WALLET_CONNECTED, {
+      addr: res.addr,
+    });
   }
 
   signStake(

@@ -6,17 +6,15 @@ settings:
 
 overrides:
   '@walletconnect/jsonrpc-types': 1.0.3
+  '@spyre-io/js': file:../core
 
 importers:
 
   .:
     dependencies:
-      '@heroiclabs/nakama-js':
-        specifier: ^2.8.0
-        version: 2.8.0
       '@spyre-io/js':
-        specifier: 0.1.12-beta.1
-        version: 0.1.12-beta.1
+        specifier: file:../core
+        version: file:../core(@heroiclabs/nakama-js@2.8.0)(@tanstack/react-query@5.29.2(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@tanstack/react-query':
         specifier: 5.29.2
         version: 5.29.2(react@18.3.1)
@@ -1111,8 +1109,13 @@ packages:
   '@shikijs/vscode-textmate@9.3.0':
     resolution: {integrity: sha512-jn7/7ky30idSkd/O5yDBfAnVt+JJpepofP/POZ1iMOxK59cOfqIgg/Dj0eFsjOTMw+4ycJN0uhZH/Eb0bs/EUA==}
 
-  '@spyre-io/js@0.1.12-beta.1':
-    resolution: {integrity: sha512-0whI7uyFgvn4pe3nleyrWQUFT5+ZvG0UWSyBw9yaGJitVlJBl6kj0Qm7oUZKTrwSCPRirXZmFHs89CHDHsEO3g==}
+  '@spyre-io/js@file:../core':
+    resolution: {directory: ../core, type: directory}
+    peerDependencies:
+      '@heroiclabs/nakama-js': ^2.8.0
+      '@tanstack/react-query': 5.29.2
+      react: ^18.3.1
+      react-dom: ^18.2.0
 
   '@stablelib/aead@1.0.1':
     resolution: {integrity: sha512-q39ik6sxGHewqtO0nP4BuSe3db5G1fEJE8ukvngS2gLkBXyy6E7pLubhbYgnkDFv6V8cWaxcE4Xn0t6LWcJkyg==}
@@ -4940,7 +4943,7 @@ snapshots:
 
   '@shikijs/vscode-textmate@9.3.0': {}
 
-  '@spyre-io/js@0.1.12-beta.1':
+  '@spyre-io/js@file:../core(@heroiclabs/nakama-js@2.8.0)(@tanstack/react-query@5.29.2(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@heroiclabs/nakama-js': 2.8.0
       '@tanstack/react-query': 5.29.2(react@18.3.1)
