@@ -83,7 +83,8 @@
   },
   "pnpm": {
     "overrides": {
-      "@walletconnect/jsonrpc-types": "1.0.3"
+      "@walletconnect/jsonrpc-types": "1.0.3",
+      "@spyre-io/js": "file:../core"
     }
   }
 }

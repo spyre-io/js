@@ -1,4 +1,4 @@
-export type Web3Address = `0x${string}`;
+export type Web3Address = `0x${string}` | string;
 
 export type Web3ConnectionStatus = "connected" | "disconnected" | "connecting";
 

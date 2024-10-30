@@ -81,5 +81,10 @@
     "typescript": "^5.4.2",
     "vite": "^5.2.13",
     "vite-plugin-dts": "^3.9.1"
+  },
+  "pnpm": {
+    "overrides": {
+      "@spyre-io/js": "file:../core"
+    }
   }
 }
