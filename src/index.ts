@@ -123,6 +123,9 @@ export {
   useIsConnected,
 } from "@/react/hooks/use-connection";
 
+// react/hooks/elo
+export {useElo, useEloHistory} from "@/react/hooks/use-elo";
+
 // react/hooks/history
 export {useHistoryFind, useHistoryGet} from "@/react/hooks/use-history";
 
