@@ -1,6 +1,6 @@
 {
   "name": "@spyre-io/js-magic",
-  "version": "0.1.1-beta.2",
+  "version": "0.2.0",
   "description": "Typescript SDK for working with Spyre on Magic.",
   "homepage": "https://github.com/spyre-io/js",
   "repository": {
