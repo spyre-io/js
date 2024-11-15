@@ -1,6 +1,6 @@
 {
   "name": "@spyre-io/js-thirdweb",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Typescript SDK for working with Spyre on Thirdweb.",
   "homepage": "https://github.com/spyre-io/js",
   "repository": {
@@ -27,6 +27,7 @@
     "build": "tsc && node ./scripts/fix-tsc.js",
     "doc": "typedoc --out docs src",
     "prepare": "cd .. && husky",
+    "prepack": "pnpm run build",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\""
   },
