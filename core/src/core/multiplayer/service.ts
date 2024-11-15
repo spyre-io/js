@@ -27,7 +27,7 @@ import {
 import {getMatchmakingBracketInfo} from "./util";
 import {childLogger} from "@/core/util/logger";
 
-const logger = childLogger("becky:multiplayer");
+const logger = childLogger("core:multiplayer");
 
 export class MultiplayerService
   implements IMultiplayerService, IMatchDataHandler

@@ -14,7 +14,7 @@ import {
 import {AsyncClientFn} from "./types";
 import {SpyreErrorCode} from "@/core/shared/errors";
 
-const logger = childLogger("becky:connection");
+const logger = childLogger("core:connection");
 
 export class ConnectionService
   implements IConnectionService, IRpcService, INakamaClientService

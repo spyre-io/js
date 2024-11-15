@@ -9,7 +9,7 @@ import {
   LeaderboardInterval,
 } from "./types";
 
-const logger = childLogger("becky:leaderboard");
+const logger = childLogger("core:leaderboard");
 
 export class LeaderboardService implements ILeaderboardService {
   constructor(private readonly _rpc: IRpcService) {

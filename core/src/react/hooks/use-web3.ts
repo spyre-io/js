@@ -5,7 +5,7 @@ import {SignStakeParameters, Txn, Web3Address} from "@/core/web3/types";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {childLogger} from "@/core/util/logger";
 
-const logger = childLogger("becky:hooks:use-web3");
+const logger = childLogger("core:hooks:use-web3");
 
 /**
  * Retrieves the current {@link Web3Config} object from the {@link IWeb3Service}.

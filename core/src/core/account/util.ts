@@ -4,7 +4,7 @@ import {Web3Address} from "@/core/web3/types";
 import {User} from "./types";
 import {childLogger} from "@/core/util/logger";
 
-const logger = childLogger("becky:account");
+const logger = childLogger("core:account");
 
 export const getUser = (account: ApiAccount): User => {
   const user = account.user;

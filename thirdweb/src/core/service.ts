@@ -50,7 +50,7 @@ import {ConnectionManager} from "thirdweb/wallets";
 import {ReadContractResult} from "thirdweb/dist/types/transaction/read-contract";
 import {IDispatcher} from "@spyre-io/js/dist/core/shared/dispatcher";
 
-const logger = childLogger("becky:web3");
+const logger = childLogger("thirdweb:web3");
 
 export class ThirdWebWeb3Service implements IWeb3Service {
   public readonly network: Chain;
@@ -635,6 +635,8 @@ export class ThirdWebWeb3Service implements IWeb3Service {
         message: stake,
       });
     } catch (error) {
+      logger.debug("Error signing stake: @Error", error);
+
       if ((error as any).code === 4001) {
         // user canceled -- do nothing
         throw new SigningError(SigningErrorType.USER_CANCELED);

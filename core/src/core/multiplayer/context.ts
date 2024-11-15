@@ -6,7 +6,7 @@ import {OpCodeInitClock} from "./types";
 import {IMatchContext} from "./interfaces";
 import {childLogger} from "@/core/util/logger";
 
-const logger = childLogger("becky:match-context");
+const logger = childLogger("core:match-context");
 
 export class MatchContext implements IMatchContext {
   private readonly _dispatcher: Dispatcher<Uint8Array> = new Dispatcher();
