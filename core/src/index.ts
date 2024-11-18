@@ -125,6 +125,7 @@ export {
   useAccountRefresh,
   useAccountUpdate,
   useAccountUpdateUsername,
+  useAccountSoftBalance,
 } from "@/react/hooks/use-account";
 
 // react/hooks/clock
