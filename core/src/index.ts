@@ -141,7 +141,7 @@ export {
   useComplianceRaffles,
   useComplianceCashGames,
   useComplianceUpdateBirthday,
-  useComplianceRefreshLocation,
+  useComplianceUpdateLocation,
 } from "@/react/hooks/use-compliance";
 
 // react/hooks/connection
