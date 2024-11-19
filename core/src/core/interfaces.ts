@@ -9,6 +9,7 @@ import {IVaultService} from "@/core/vault/interfaces";
 import {IClockService} from "@/core/clock/interfaces";
 import {IMultiplayerService} from "@/core/multiplayer/interfaces";
 import {LogConfig} from "@/core/types";
+import {IComplianceService} from "./compliance/service";
 
 /**
  * The main client object that provides access to all Spyre services.
@@ -63,6 +64,11 @@ export interface ISpyreClient {
    * Retrieves the {@link IClockService} instance. This provides access to an accurate server time offset.
    */
   clock: IClockService;
+
+  /**
+   * Retrieves the {@link IComplianceService} instance. This provides access to the compliance service, which allows you to check if a user is eligible to play.
+   */
+  compliance: IComplianceService;
 
   /**
    * Initializes the client. This should be called before using any other services.

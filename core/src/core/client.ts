@@ -10,6 +10,7 @@ import {IClockService} from "./clock/interfaces";
 import {IHistoryService} from "./history/interfaces";
 import {INotificationService} from "./notifications/interfaces";
 import {IVaultService} from "./vault/interfaces";
+import {IComplianceService} from "./compliance/service";
 
 export class SpyreClient implements ISpyreClient {
   constructor(
@@ -23,6 +24,7 @@ export class SpyreClient implements ISpyreClient {
     public readonly history: IHistoryService,
     public readonly vaults: IVaultService,
     public readonly clock: IClockService,
+    public readonly compliance: IComplianceService,
   ) {
     //
   }

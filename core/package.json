@@ -1,6 +1,6 @@
 {
   "name": "@spyre-io/js",
-  "version": "0.2.2",
+  "version": "0.3.1",
   "description": "Typescript SDK for working with Spyre.",
   "homepage": "https://github.com/spyre-io/js",
   "repository": "github:spyre-io/js",

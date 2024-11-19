@@ -9,6 +9,10 @@ export {AccountService} from "@/core/account/service";
 export type {IClockService} from "@/core/clock/interfaces";
 export {ClockService} from "@/core/clock/service";
 
+// core/compliance
+export type {IComplianceService} from "@/core/compliance/service";
+export {ComplianceService} from "@/core/compliance/service";
+
 // core/history
 export type {
   IHistoryService,
@@ -130,6 +134,15 @@ export {
 
 // react/hooks/clock
 export {useClockOffsetMillis} from "@/react/hooks/use-clock";
+
+// reac/hooks/compliance
+export {
+  useComplianceRefresh,
+  useComplianceRaffles,
+  useComplianceCashGames,
+  useComplianceUpdateBirthday,
+  useComplianceRefreshLocation,
+} from "@/react/hooks/use-compliance";
 
 // react/hooks/connection
 export {
