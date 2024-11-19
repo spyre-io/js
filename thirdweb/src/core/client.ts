@@ -1,6 +1,7 @@
 import {
   AccountService,
   ClockService,
+  ComplianceService,
   ConnectionService,
   CreateSpyreClientOptions,
   Dispatcher,
@@ -60,6 +61,7 @@ export function createThirdwebSpyreClient(
   );
   const multiplayer = new MultiplayerService(connection, web3, connection);
   const clock = new ClockService(multiplayer);
+  const compliance = new ComplianceService(connection);
 
   // todo: fix circular dependencies
   multiplayer.init(clock);
@@ -76,5 +78,6 @@ export function createThirdwebSpyreClient(
     history,
     vaults,
     clock,
+    compliance,
   );
 }

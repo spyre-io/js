@@ -4,9 +4,6 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-overrides:
-  '@spyre-io/js': file:../core
-
 importers:
 
   .:
@@ -18,8 +15,8 @@ importers:
         specifier: ^28.16.0
         version: 28.16.0(localforage@1.10.0)
       '@spyre-io/js':
-        specifier: file:../core
-        version: file:../core(@heroiclabs/nakama-js@2.8.0)(@tanstack/react-query@5.29.2(react@18.3.1))(bufferutil@4.0.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(utf-8-validate@5.0.10)
+        specifier: 0.3.1
+        version: 0.3.1(@heroiclabs/nakama-js@2.8.0)(@tanstack/react-query@5.29.2(react@18.3.1))(bufferutil@4.0.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(utf-8-validate@5.0.10)
       '@tanstack/react-query':
         specifier: 5.29.2
         version: 5.29.2(react@18.3.1)
@@ -681,8 +678,8 @@ packages:
     resolution: {integrity: sha512-t09vSN3MdfsyCHoFcTRCH/iUtG7OJ0CsjzB8cjAmKc/va/kIgeDI/TxsigdncE/4be734m0cvIYwNaV4i2XqAw==}
     engines: {node: '>=10'}
 
-  '@spyre-io/js@file:../core':
-    resolution: {directory: ../core, type: directory}
+  '@spyre-io/js@0.3.1':
+    resolution: {integrity: sha512-uyM5m1acj3tdCvqwqq2GTOa11oo29pRAeePtKUnxS6ikm1wF/47ZwVxeNQqfZZGgh/meq+BjysCYv16mCo5Lug==}
     peerDependencies:
       '@heroiclabs/nakama-js': ^2.8.0
       '@tanstack/react-query': 5.29.2
@@ -3772,7 +3769,7 @@ snapshots:
 
   '@sindresorhus/is@4.6.0': {}
 
-  '@spyre-io/js@file:../core(@heroiclabs/nakama-js@2.8.0)(@tanstack/react-query@5.29.2(react@18.3.1))(bufferutil@4.0.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(utf-8-validate@5.0.10)':
+  '@spyre-io/js@0.3.1(@heroiclabs/nakama-js@2.8.0)(@tanstack/react-query@5.29.2(react@18.3.1))(bufferutil@4.0.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(utf-8-validate@5.0.10)':
     dependencies:
       '@heroiclabs/nakama-js': 2.8.0
       '@tanstack/react-query': 5.29.2(react@18.3.1)

@@ -14,7 +14,7 @@ importers:
     dependencies:
       '@spyre-io/js':
         specifier: file:../core
-        version: file:../core(@heroiclabs/nakama-js@2.8.0)(@tanstack/react-query@5.29.2(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 0.3.1(@heroiclabs/nakama-js@2.8.0)(@tanstack/react-query@5.29.2(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@tanstack/react-query':
         specifier: 5.29.2
         version: 5.29.2(react@18.3.1)
@@ -1109,8 +1109,8 @@ packages:
   '@shikijs/vscode-textmate@9.3.0':
     resolution: {integrity: sha512-jn7/7ky30idSkd/O5yDBfAnVt+JJpepofP/POZ1iMOxK59cOfqIgg/Dj0eFsjOTMw+4ycJN0uhZH/Eb0bs/EUA==}
 
-  '@spyre-io/js@file:../core':
-    resolution: {directory: ../core, type: directory}
+  '@spyre-io/js@0.3.1':
+    resolution: {integrity: sha512-uyM5m1acj3tdCvqwqq2GTOa11oo29pRAeePtKUnxS6ikm1wF/47ZwVxeNQqfZZGgh/meq+BjysCYv16mCo5Lug==}
     peerDependencies:
       '@heroiclabs/nakama-js': ^2.8.0
       '@tanstack/react-query': 5.29.2
@@ -4943,7 +4943,7 @@ snapshots:
 
   '@shikijs/vscode-textmate@9.3.0': {}
 
-  '@spyre-io/js@file:../core(@heroiclabs/nakama-js@2.8.0)(@tanstack/react-query@5.29.2(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@spyre-io/js@0.3.1(@heroiclabs/nakama-js@2.8.0)(@tanstack/react-query@5.29.2(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@heroiclabs/nakama-js': 2.8.0
       '@tanstack/react-query': 5.29.2(react@18.3.1)
