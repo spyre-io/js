@@ -91,16 +91,3 @@ export const useAccountUpdateUsername = () => {
     mutationFn: query,
   });
 };
-
-export const useAccountSoftBalance = (currencyName: string) => {
-  const {data} = useAccount();
-
-  return useQuery({
-    queryKey: ["account", "soft-balance", currencyName],
-    queryFn: async () => {
-      const value = data?.balances[currencyName] ?? 0;
-      return Number(value);
-    },
-    enabled: !!data,
-  });
-};

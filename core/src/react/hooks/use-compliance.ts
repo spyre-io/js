@@ -1,4 +1,4 @@
-import {useMutation, useQuery} from "@tanstack/react-query";
+import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {useClient} from "./use-client.js";
 import {useCallback, useSyncExternalStore} from "react";
 
@@ -41,11 +41,17 @@ export const useComplianceCashGames = () => {
 
 export const useComplianceUpdateBirthday = () => {
   const {compliance} = useClient();
+  const client = useQueryClient();
 
   const fn = useCallback(
-    async ({year, month, day}: {year: number; month: number; day: number}) =>
-      await compliance.updateBirthday(year, month, day),
-    [compliance],
+    async ({year, month, day}: {year: number; month: number; day: number}) => {
+      await compliance.updateBirthday(year, month, day);
+
+      await client.invalidateQueries({
+        queryKey: ["compliance"],
+      });
+    },
+    [client, compliance],
   );
 
   return useMutation({
@@ -58,16 +64,21 @@ export const useComplianceUpdateLocation = (
   feature: "cashGames" | "raffles",
 ) => {
   const {compliance} = useClient();
+  const client = useQueryClient();
 
   const fn = useCallback(async () => {
     await compliance.updateLocation();
+
+    await client.invalidateQueries({
+      queryKey: ["compliance"],
+    });
 
     if (feature === "raffles") {
       return compliance.raffles.getValue();
     }
 
     return compliance.cashGames.getValue();
-  }, [compliance, feature]);
+  }, [client, compliance, feature]);
 
   return useMutation({
     mutationKey: ["compliance", "refresh-ip"],
