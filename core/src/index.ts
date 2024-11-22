@@ -149,6 +149,14 @@ export {
   useIsConnected,
 } from "@/react/hooks/use-connection";
 
+// react/hooks/discord
+export {
+  useDiscordConnectionStatus,
+  useDiscordUserId,
+  useDiscordUsername,
+  useDiscordUnlink,
+} from "@/react/hooks/use-discord";
+
 // react/hooks/elo
 export {useElo, useEloHistory} from "@/react/hooks/use-elo";
 
@@ -174,6 +182,9 @@ export {
 
 // react/hooks/notifications
 export {useNotifHandler} from "@/react/hooks/use-notifications";
+
+// react/hooks/raffle
+export {useRaffles, useRaffleSubmit} from "@/react/hooks/use-raffle";
 
 // react/hooks/rpc
 export {useRpcCall} from "@/react/hooks/use-rpc";
