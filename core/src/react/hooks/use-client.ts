@@ -1,4 +1,4 @@
-import {useCallback, useContext, useMemo} from "react";
+import {useCallback, useContext, useMemo, useSyncExternalStore} from "react";
 import {getDeviceId} from "@/core/util";
 import {useQueryClient} from "@tanstack/react-query";
 import {ISpyreClient} from "@/core/interfaces";
@@ -37,7 +37,11 @@ export const useClient = (): ISpyreClient => {
  * ```
  */
 export const useDeviceId = () => {
-  const deviceId = useMemo(() => getDeviceId(), []);
-
-  return deviceId;
+  return useSyncExternalStore(
+    // never changes
+    (_: () => void) => () => {},
+    getDeviceId,
+    // client only
+    () => null,
+  );
 };
