@@ -81,24 +81,23 @@ export class MultiplayerService
     );
 
     const {brackets, dictionaries, refreshSecUTC} = res;
-    this._brackets = brackets
-      .sort((a, b) => a.id - b.id)
-      .map((b) => {
-        const dict = dictionaries.find((d) => d.bracketId === b.id);
-        if (!dict) {
-          return {
-            ...b,
-            dictIds: [],
-            dictNames: [],
-          };
-        }
+    this._brackets = brackets.map((b) => {
+      const dict = dictionaries.find((d) => d.bracketId === b.id);
 
+      if (!dict) {
         return {
           ...b,
-          dictIds: dict.dictIds,
-          dictNames: dict.dictNames,
+          dictIds: [],
+          dictNames: [],
         };
-      });
+      }
+
+      return {
+        ...b,
+        dictIds: dict.dictIds,
+        dictNames: dict.dictNames,
+      };
+    });
 
     this.bracketRefreshSecUTC.setValue(refreshSecUTC);
   }
