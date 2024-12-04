@@ -53,3 +53,13 @@ export const useDiscordUnlink = () => {
     mutationFn: fn,
   });
 };
+
+export const useDiscordIsGuildMember = () => {
+  const {data: account} = useAccount();
+  const metadata = useMemo(
+    () => JSON.parse(account?.metadata || "{}"),
+    [account],
+  );
+
+  return metadata.discordGuildIsMember === true;
+};

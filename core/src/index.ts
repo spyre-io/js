@@ -155,6 +155,7 @@ export {
   useDiscordUserId,
   useDiscordUsername,
   useDiscordUnlink,
+  useDiscordIsGuildMember,
 } from "@/react/hooks/use-discord";
 
 // react/hooks/elo
