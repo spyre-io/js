@@ -46,7 +46,7 @@ import {
   ThirdwebContract,
 } from "thirdweb";
 import {base, baseSepolia, Chain} from "thirdweb/chains";
-import {ConnectionManager} from "thirdweb/wallets";
+import {Account, ConnectionManager} from "thirdweb/wallets";
 import {ReadContractResult} from "thirdweb/dist/types/transaction/read-contract";
 import {IDispatcher} from "@spyre-io/js/dist/core/shared/dispatcher";
 
@@ -248,6 +248,11 @@ export class ThirdWebWeb3Service implements IWeb3Service {
 
   get isInAppWallet(): WatchedValue<boolean> {
     return this._isInAppWallet;
+  }
+
+  // escape hatch
+  get thirdwebAccount(): Account | undefined {
+    return this._connectionManager.activeAccountStore.getValue();
   }
 
   link = async (cancelToken?: CancelToken): Promise<void> => {
