@@ -7,7 +7,8 @@ type GetRaffleResponse = {
   error?: string;
   raffles: any[];
   winners: any[];
-  entries: any[];
+  entries: {};
+  totals: {};
 };
 
 type SubmitRaffleResponse = {
@@ -29,6 +30,7 @@ export const useRaffles = (ns: string) => {
       raffles: res.raffles,
       winners: res.winners,
       entries: res.entries,
+      totals: res.totals,
     };
   }, [client, ns]);
 
